@@ -27,7 +27,7 @@ Entity& Manifest::operator[]( int index ) {
 
 void Manifest::debug() {
 
-    std::cout << "MANIFEST DEBUG - Size: " << size() << "\n";
+    std::cout << "\nMANIFEST DEBUG - Size: " << size() << "\n";
     for (int i=0; i<size(); ++i) {
 
         std::cout << "Entity[" << entities[i].getName() << ", addr:"  

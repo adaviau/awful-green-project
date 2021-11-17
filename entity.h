@@ -15,7 +15,7 @@ enum ENTITY_TYPE {
 
 class Entity {
 
-private:
+protected:
     int id;
     std::string name;
     ENTITY_TYPE type;
@@ -28,6 +28,7 @@ public:
 
     int getID();
     void enter( Location& );
+    void exit( Location& );
 
     Location * getLocation();
     std::string getName();
