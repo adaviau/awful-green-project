@@ -10,7 +10,10 @@ private:
     int movement;
     int strength;
     int constitution;
+
+protected:
     bool stunned;
+    bool active;
 
 public:
     Actor( ENTITY_TYPE );
@@ -19,6 +22,14 @@ public:
 
     void setStats( int, int, int );
     bool isStunned();
+    bool isActive();
+
+    void stun();
+    void wakeup();
+
+    int getMovement();
+    int getStrength();
+    int getConstitution();
 
 };
 

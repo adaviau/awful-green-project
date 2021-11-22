@@ -1,71 +1,30 @@
 #include <iostream>
 
-#include "location.h"
-#include "manifest.h"
-#include "map.h"
+#include "game_master.h"
 
-#include "crew.h"
-#include "monster.h"
-#include "weapon.h"
-
-#include "hardcoded.h"
+#include "test_dev.h"
+// #include "test_map.h"
+#include "test_battle.h"
+#include "test_monster_grow.h"
+#include "test_accessors.h"
 
 
 int main() {
 
-    Map map;
-    Manifest crew;
-    Manifest monsters;
-    Manifest weapons;
+    // test_crew_attack_monster();
 
-    buildMap( map );
-    buildCrew( crew );
-    buildMonsters( monsters );
-    buildWeapons( weapons );
-    
-    Entity * andrew = &crew[0];
-    Entity * allison = &crew[2];
-    Entity * victoria = &crew[3];
+    // test_monster_grow();
+    // test_monster_accessor();
+    // test_crew_accessor();
+    // test_location_accessor();
+    // test1();
+    // test2();
+    // test3();
+    // test1_1();
 
-    andrew->enter( map[0] );
-    allison->enter( map[7] );
-    victoria->enter( map[0] );
-
-    victoria->enter( map[0] );
-    victoria->exit( map[0] );
-    victoria->enter( map[0] );
-    victoria->enter( map[6] );
-    victoria->exit( map[0] );
-
-    weapons[0].enter( map[0] );
-
-    Monster * egg = static_cast<Monster*>( &monsters[1] );
-
-    std::cout << "Type: " << egg->getName() << "\n";
-
-    Monster m = Monster( "BABY", map[0] );
-    Monster * temp = &m;
-
-    std::cout << "Stage: " << temp->getStage() << "\n";
-    std::cout << "Stunned: " << temp->isStunned() << "\n";
-
-    Entity * e = temp;
-
-    std::cout << "Stage: " << e->getName() << "\n";
-
-    Monster * new_temp = static_cast<Monster*>( e );
-    std::cout << "Stage: " << new_temp->getStage() << "\n";
-    std::cout << "Stunned: " << new_temp->isStunned() << "\n";
-
-    bool boolean = false;
-    std::cout << "Bool: " << boolean << "\n";
-
-    std::cout << "Is Victoria in " << map[6].getName() << " : " << map[6].find_entity( *victoria ) << "\n";
-
-    // map.debug(); 
-    // crew.debug();
-    // monsters.debug();
-    // weapons.debug();
+    GameMaster gm;
+    gm.init();
+    gm.run();
 
     return 0;
 

@@ -7,20 +7,16 @@ class Monster : public Actor {
 
 private:
     std::string stage;
-    bool active;
     void setType( std::string );
 
 public:
     Monster( std::string );
     Monster( std::string, Location& );
-    bool isActive();
     std::string getStage();
 
-    
+    void activate();
 // active : bool
 // stage : string
-
-// isActive() : bool
 // getStage : string
 
 

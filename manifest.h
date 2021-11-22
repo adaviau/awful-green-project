@@ -9,7 +9,7 @@
 class Manifest {
 
 private:
-    std::vector< Entity > entities;
+    std::vector< Entity* > entities;
 
 public:
     Manifest();

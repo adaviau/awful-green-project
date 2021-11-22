@@ -7,14 +7,16 @@
 class Crew : public Actor {
 
 private:
-    bool alive;
     Weapon * weapon;
     // Equipement * wearable;
 
 public:
+    Crew( std::string );
     Crew( std::string, Location& );
-    
-    bool isAlive();
+
+    void grab( Weapon& );
+    // void grab( Equipment& );
+    void drop();
 
 };
 

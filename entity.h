@@ -28,7 +28,7 @@ public:
 
     int getID();
     void enter( Location& );
-    void exit( Location& );
+    void exit();
 
     Location * getLocation();
     std::string getName();

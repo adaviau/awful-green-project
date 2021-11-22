@@ -5,7 +5,7 @@
 
 static int UNIQUE_IDENTIFIER = 2000;
 
-Location::Location() : Location( "invalid", -1 ) {}
+Location::Location() : Location( "invalid", -1 ) {  }
 
 Location::Location( std::string n, int i ) {
 
@@ -42,6 +42,7 @@ int Location::find_index( Entity& e ) {
         if ( occupents[i]->getID() == e.getID() )
             return i;
     return -1;
+    
 }
 
 Entity * Location::find_entity( Entity& e ) {
@@ -55,12 +56,12 @@ Entity * Location::find_entity( Entity& e ) {
 
 void Location::add_occupent( Entity& e ) { 
 
-    std::cout << "DEBUG - Entity[" << e.getName() << "]"
-                << " wants to be added to the guest list " << name << std::endl;
+    // std::cout << "DEBUG - Entity[" << e.getName() << "]"
+    //             << " wants to be added to the guest list " << name << std::endl;
     if ( contains( e ) ) {
-        std::cout << "DEBUG - Entity is already in occupent list.\n";
+        // std::cout << "DEBUG - Entity is already in occupent list.\n";
     } else {
-        std::cout << "DEBUG - Entity added to occupent list.\n";
+        // std::cout << "DEBUG - Entity added to occupent list.\n";
         occupents.push_back( &e );
     }
     
@@ -68,16 +69,16 @@ void Location::add_occupent( Entity& e ) {
 
 void Location::remove_occupent( Entity& e ) { 
 
-    std::cout << "DEBUG - Entity[" << e.getName() << "]"
-                << " wants to be removed from the guest list " << name << std::endl;
+    // std::cout << "DEBUG - Entity[" << e.getName() << "]"
+    //             << " wants to be removed from the guest list " << name << std::endl;
     int temp_index = find_index( e );
     if ( temp_index >= 0 ) {
-        std::cout << "DEBUG - Entity is on the list.\n";
-        std::cout << "DEBUG - Removing Entity from list.\n";
+        // std::cout << "DEBUG - Entity is on the list.\n";
+        // std::cout << "DEBUG - Removing Entity from list.\n";
         std::iter_swap( occupents.begin()+temp_index, occupents.end()-1 );
         occupents.pop_back();
     } else {
-        std::cout << "DEBUG - Entity was not on the list.\n";
+        // std::cout << "DEBUG - Entity was not on the list.\n";
     }
     
 }

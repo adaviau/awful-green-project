@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "actor.h"
 
 Actor::Actor( ENTITY_TYPE t ) : Actor( "Invalid", t ) { }
@@ -14,7 +16,15 @@ void Actor::setStats( int m, int s, int c ) {
     movement = m;
     strength = s;
     constitution = c;
-
+    std::cout << "Stats (m,s,c) : " << movement << "," << strength << "," << constitution << "\n";
 }
 
-bool Actor::isStunned() {   return stunned; }
+int Actor::getMovement() { return movement; }
+int Actor::getStrength() { return strength; }
+int Actor::getConstitution() { return constitution; }
+
+bool Actor::isStunned() { return stunned; }
+bool Actor::isActive() { return active; }
+
+void Actor::stun() { stunned = true; }
+void Actor::wakeup() { stunned = false; }

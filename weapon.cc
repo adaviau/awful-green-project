@@ -1,24 +1,58 @@
-#include "weapon.h"
+#include <iostream>
 
+#include "weapon.h"
 
 Weapon::Weapon( std::string n ) : 
                     Entity( n, WEAPON ) {
-    onGround = true;
+    held = false;
+    deployable = false;
+    deployed = false;
     location = nullptr;
         
 }
 
 Weapon::Weapon( std::string n, Location& l ) : 
-                    Entity( n, WEAPON, l ) {
-    onGround = true;
+                    Weapon( n ) {
+
+    location = &l;
         
 }
 
-bool Weapon::isHeld() {     return !onGround;   }
+void Weapon::set_deployable() { 
+    std::cout << "DEBUG - " << deployable << std::endl;
+    deployable = true; 
+    std::cout << "DEBUG - set_deployable: " << deployable << std::endl;
+}
 
-// void Weapon::drop(  ) {
-//     onGround = true;
-// }
+void Weapon::grab() {
+
+    exit();
+    held = true;
+
+}
+
+void Weapon::drop( Location& l ) {
+
+    std::cout << l.getName();
+    enter( l );
+    held = false;
+
+}
+
+void Weapon::deploy( Location& l ) {     
+
+    if ( deployable ) 
+        deployed = true;
+    drop( l );
+
+}
+
+bool Weapon::isHeld() {     return held;   }
+
+bool Weapon::isDeployable() {     return deployable;   }
+
+bool Weapon::isDeployed() {     return deployed;   }
+
 
 // void Weapon::pickup( Actor& a ) {
 //     onGround = false;

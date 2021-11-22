@@ -17,6 +17,8 @@ Monster::Monster( std::string s, Location& l ) :
 
 }
 
+void Monster::activate() {  active = true;  };
+
 void Monster::setType( std::string s ) {
 
     stage = s; 
