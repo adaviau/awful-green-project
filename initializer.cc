@@ -76,6 +76,7 @@ void Initializer::buildCrew( Manifest& m ) {
     denis->setStats( 2, 1, 1 );
     std::cout << "Set Vic can move " << victoria->getMovement() << " places\n";
 
+    // andrew->stun();
     allison->stun();
     denis->stun();
     victoria->stun();
@@ -95,7 +96,7 @@ void Initializer::buildMonsters( Manifest& m ) {
     Monster * adult = new Monster( "ADULT" );
 
     adult->activate();
-    adult->stun();
+    // adult->stun();
 
     m.add( *fragment );
     m.add( *egg );

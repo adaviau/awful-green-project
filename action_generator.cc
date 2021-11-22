@@ -59,14 +59,12 @@ void ActionGenerator::get_movement_range( Actor * a, int depth, Location& l,
                 get_connected_locations( l, m );
  
             for ( int i=0; i<neighbors.size(); ++i )
-                if ( a->getType() == CREW ) {
-                    // std::cout << "Has Monsters: " << get_entities( MONSTER, location, map ).size() << std::endl;
-                    if ( ( !has_halting_entities( a->getType(), l, m ) ) || 
-                         ( l.id == a->getLocation()->id ) ) {
+                if ( ( !has_halting_entities( a->getType(), l, m ) ) || 
+                     ( l.id == a->getLocation()->id ) ) {
                         // std::cout << "Eval as true\n";
-                        get_movement_range( a, depth-1, m[ neighbors[i]->map_idx ], m, list );
-                    }
+                    get_movement_range( a, depth-1, m[ neighbors[i]->map_idx ], m, list );
                 }
+                
         }
     }
 }
@@ -116,8 +114,9 @@ bool ActionGenerator::has_halting_entities( ENTITY_TYPE t, Location& l, Map& m )
     } else if ( t == MONSTER ) {
 
         std::vector< Crew* > list = get_crew_targets( l, m );
+        // std::cout << "DEBUG - Crew list is " << list.size() << " long.\n"; 
         for ( auto it = list.begin(); it != list.end(); ++it ) 
-            if ( (*it)->isActive() )
+            if ( !(*it)->isStunned() )
                 return true;
 
     }
@@ -217,7 +216,7 @@ std::vector< Monster* > ActionGenerator::shuffled_monster_list( Manifest& m ) {
     if ( output.size() )
         std::shuffle( output.begin(), output.end(), random_engine() );
 
-    std::cout << "REACHED\n";
+    // std::cout << "REACHED\n";
     return output;
 }
 std::vector< Location* > ActionGenerator::shuffled_location_list( Map& m ) {

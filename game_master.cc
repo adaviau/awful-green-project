@@ -37,8 +37,8 @@ void GameMaster::weapon_placement() {
     weapons[0].enter( map[1] );
     // weapons[3].enter( map[0] );
     Weapon * fence = static_cast< Weapon* >( &weapons[3] );
-    std::cout << "is fence deployable " << fence->isDeployable() << std::endl;
-    fence->deploy( map[8] );
+    // std::cout << "is fence deployable " << fence->isDeployable() << std::endl;
+    // fence->deploy( map[8] );
 
 }
 
@@ -59,28 +59,30 @@ void GameMaster::run() {
 
 void GameMaster::crew_turn() {
 
-    // std::cout << "Turn " << turn << " - Crewmen" << std::endl;
+    std::cout << "Turn " << turn << " - Crewmen" << std::endl;
     
     // std::cout << "--Pickup Phase" << std::endl;
     std::vector< Crew* > list = ActionGenerator::shuffled_crew_list( crew );
+
     // Grab Weapons
     for (auto it = list.begin(); it != list.end(); ++it) {
         // std::cout << (*it)->getName() << " didn't pickup a weapon." << std::endl;
     }
+    
+    
     // std::cout << "--Movement Phase" << std::endl;
     // Move
     list = ActionGenerator::shuffled_crew_list( crew );
     for (auto it = list.begin(); it != list.end(); ++it) {            
-   
-        // std::cout << (*it)->getName() << " can move " << (*it)->getMovement() << 
-        //     " spaces" << std::endl;
   
         if ( (*it)->getLocation() ) {      
             std::vector< Location* > move_to = ActionGenerator::get_movement( *it, map );
-            // std::cout << "DEBUG - Desination list is " << move_to.size() << " long." << std::endl;
+            
             std::uniform_int_distribution<int> range( 0, move_to.size()-1 );
             (*it)->enter( *move_to[ range( mt_rand ) ] );
-            std::cout << "Moved to " << (*it)->getLocation()->getName() << std::endl;
+            std::cout << (*it)->getName() << "(" << (*it)->getID() << ")";
+            std::cout << " moved to " << (*it)->getLocation()->getName() << std::endl;
+
         }
     }
 
@@ -97,13 +99,29 @@ void GameMaster::crew_turn() {
 
 void GameMaster::monster_turn() {
 
-    // std::cout << "Turn " << turn << " - Monsters" << std::endl;
+
+    std::cout << "Turn " << turn << " - Monsters" << std::endl;
+    std::vector< Monster* > list = ActionGenerator::shuffled_monster_list( monsters );
 
     // Grow
 
 
+    // std::cout << "--Movement Phase" << std::endl;
     // Move
+    list = ActionGenerator::shuffled_monster_list( monsters );
+    for (auto it = list.begin(); it != list.end(); ++it) {            
+  
+        if ( (*it)->getLocation() ) {      
+            std::vector< Location* > move_to = ActionGenerator::get_movement( *it, map );
+            // std::cout << "DEBUG - Desination list is " << move_to.size() << " long." << std::endl;
+            std::uniform_int_distribution<int> range( 0, move_to.size()-1 );
+            (*it)->enter( *move_to[ range( mt_rand ) ] );
 
+            std::cout << (*it)->getName() << "(" << (*it)->getID() << ")";
+            std::cout << " moved to " << (*it)->getLocation()->getName() << std::endl;
+
+        }
+    }
 
     // Attack
 
