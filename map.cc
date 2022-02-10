@@ -24,7 +24,7 @@ std::vector<Location>& Map::getLocations() {   return locations;   }
 
 void Map::debug() {
 
-    std::cout << "MAP DEBUG - Size: " << size() << "\n";
+    std::cout << "\nMAP DEBUG - Size: " << size() << "\n";
     for (int i=0; i<size(); ++i) {
 
         int occupent_count = locations[i].num_occupents();
@@ -35,9 +35,9 @@ void Map::debug() {
                             << "]" << std::endl;
 
         for (int k=0; k<occupent_count; ++k) 
-            std::cout << "   Entity[" << locations[i].occupents[k];
-        if ( occupent_count )
-            std::cout << "]" << std::endl;
+            std::cout << "   Entity[" << locations[i].occupents[k] << "]" << std::endl;
+        // if ( occupent_count > 1 )
+        //     std::cout << "]" << std::endl;
 
     }
 

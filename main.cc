@@ -1,44 +1,36 @@
 #include <iostream>
 
-#include "location.h"
-#include "entity.h"
-#include "manifest.h"
-#include "map.h"
+#include "game_master.h"
 
-void buildMap( Map& m ) {
+#include "test_dev.h"
+// #include "test_map.h"
+#include "test_battle.h"
+#include "test_monster_grow.h"
+#include "test_weapon_grabs.h"
+#include "test_accessors.h"
 
-    Location kitchen( "Kitchen", 0 );
-    Location bathroom( "Bathroom", 1 );
-    Location basement( "Basement", 2 );
-    m.add( kitchen );
-    m.add( bathroom );
-    m.add( basement );
 
-}
+int main( int argc, char *argv[] ) {
 
-void buildManifest( Manifest& m ) {
+    int turn_count = 50;
+    if ( argc > 1 )
+        turn_count = std::atoi( argv[1] );
 
-    Entity andrew( "Andrew", CREW );
-    Entity denis( "Denis", CREW );
-    m.add( andrew );
-    m.add( denis );
+    // test_crew_attack_monster();
 
-}
+    // test_monster_grow();
+    // test_monster_accessor();
+    // test_crew_accessor();
+    // test_location_accessor();
+    // test_weapon_grabs();
+    // test1();
+    // test2();
+    // test3();
+    // test1_1();
 
-int main() {
-
-    Map map;
-    Manifest crew;
-    buildMap( map );
-    buildManifest( crew );
-
-    Entity * andrew = &crew[0];
-    Location * kitchen = &map[0];
-
-    andrew->enter( *kitchen );
-
-    map.debug();
-    crew.debug();
+    GameMaster gm( turn_count );
+    gm.init();
+    gm.run();
 
     return 0;
 

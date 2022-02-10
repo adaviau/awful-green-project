@@ -21,8 +21,18 @@ Entity::Entity( std::string n, ENTITY_TYPE t, Location& l ) : Entity(n, t) {
 
 void Entity::enter( Location& l ) {
 
+    exit();
     location = &l;
-    location->enter( *this );
+    location->add_occupent( *this );
+
+}
+
+void Entity::exit() {
+
+    if ( location ) 
+        location->remove_occupent( *this );
+
+    location = nullptr;
 
 }
 
