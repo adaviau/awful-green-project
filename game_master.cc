@@ -14,6 +14,7 @@ void GameMaster::init() {
     Initializer::buildCrew( crew );
     Initializer::buildMonsters( monsters );
     Initializer::buildWeapons( weapons );
+    Initializer::buildEffects( effects );
 
     crew_placement();
     monster_placement();
@@ -47,6 +48,75 @@ void GameMaster::weapon_placement() {
     Weapon * fence = static_cast< Weapon* >( &weapons[3] );
     // std::cout << "is fence deployable " << fence->isDeployable() << std::endl;
     // fence->deploy( map[8] );
+
+}
+
+void GameMaster::run_design_weapons() {
+
+    crew_discovers_monsters();
+    Crew *andrew = static_cast< Crew* >( &crew[0] );
+    Weapon *pool_queue = static_cast< Weapon* >( &weapons[4] );
+
+    std::cout << "Number of weapon effect chits: " << effects.size() << std::endl;
+    
+    std::cout << "Is the Pool Queue tested: " << pool_queue->isTested() << std::endl;
+    std::cout << "  Quene Effect: " << pool_queue->get_monster_effect() << std::endl;
+    std::cout << "First one is: " << effects[0]->getName() << std::endl;
+    std::cout << "  Available: " << effects[0]->is_available() << std::endl;
+
+    pool_queue->assign_effect( *effects[0] );
+
+    std::cout << "Is the Pool Queue tested: " << pool_queue->isTested() << std::endl;
+    std::cout << "  Quene Effect: " << pool_queue->get_monster_effect() << std::endl;
+    std::cout << "First one is: " << effects[0]->getName() << std::endl;
+    std::cout << "  Available: " << effects[0]->is_available() << std::endl;
+
+    ActionGenerator::get_available_effect( effects );
+    std::cout << "Is the Pool Queue tested: " << pool_queue->isTested() << std::endl;
+    std::cout << "  Quene Effect: " << pool_queue->get_monster_effect() << std::endl;
+    std::cout << "First one is: " << effects[0]->getName() << std::endl;
+    std::cout << "  Available: " << effects[0]->is_available() << std::endl;
+
+    // pool_queue->remove_effect( );
+
+    std::cout << "Is the Pool Queue tested: " << pool_queue->isTested() << std::endl;
+    std::cout << "  Quene Effect: " << pool_queue->get_monster_effect() << std::endl;
+    std::cout << "First one is: " << effects[0]->getName() << std::endl;
+    std::cout << "  Available: " << effects[0]->is_available() << std::endl;
+
+    map.debug();
+    weapons.debug();
+    crew.debug();
+
+    std::cout << "EVENT- andrew picks up pool queue" << std::endl; 
+    andrew->grab( *pool_queue ); 
+
+    map.debug();
+    weapons.debug();
+    crew.debug();
+
+    std::cout << "EVENT- andrew enters Engine Room" << std::endl; 
+    andrew->enter( map[3] );
+
+    map.debug();
+    weapons.debug();
+    crew.debug();
+
+    std::cout << "EVENT- andrew drops pool queue" << std::endl; 
+    andrew->drop();  
+
+    map.debug();
+    weapons.debug();
+    crew.debug();
+
+    std::cout << "Is the Pool Queue tested: " << pool_queue->isTested() << std::endl;
+    std::cout << "  Quene Effect: " << pool_queue->get_monster_effect() << std::endl;
+    std::cout << "First one is: " << effects[0]->getName() << std::endl;
+    std::cout << "  Available: " << effects[0]->is_available() << std::endl<< std::endl;
+
+    std::cout << "Andrew tries to pickup Pool Queue." << std::endl;
+    andrew->grab( *pool_queue );
+    std::cout << "Andrew is holding: " << andrew->getWeapon()->getName() << std::endl;
 
 }
 
@@ -214,6 +284,8 @@ void GameMaster::crew_turn() {
     map.debug();
     std::cout << "**************************" << std::endl;
     // Attack
+
+    std::cout << "VERBOSE- generating random location list" << std::endl;
     std::vector< Location* > location_list = ActionGenerator::shuffled_location_list( map );
 
     // weapons.debug();
@@ -221,12 +293,14 @@ void GameMaster::crew_turn() {
     for (auto it = location_list.begin(); it != location_list.end(); ++it) {
 
         // GET TARGET LIST AT LOCATION
+        std::cout << "VERBOSE- generating target(s) list" << std::endl;
         std::vector< Monster* > targets = ActionGenerator::get_monster_targets_near( **it, map );
 
         // GET ALL CREW THAT CAN ATTACK HERE
+        std::cout << "VERBOSE- generating attacker(s) list" << std::endl;
         std::vector< Crew* > attackers = ActionGenerator::crew_that_can_attack( **it, crew );
 
-        std::cout << "DEBUG-- " << "There are " << targets.size() << " target(s) and " << 
+        std::cout << "STATE-- " << "There are " << targets.size() << " target(s) and " << 
             attackers.size() << " attacker(s)" << " in the " << (*it)->getName() << std::endl;  
         
         // DEAL WITH TARGETS ONE AT A TIME
@@ -254,6 +328,9 @@ void GameMaster::crew_turn() {
                 " is of size " << attack_team.size() << std::endl;
             
             // CALCULATE DAMAGES FROM ATTACK TEAM
+            apply_attack( *targets[i], attack_team );
+
+/*
             int directed_damage = 0;
             int splash_damage = 0;
 
@@ -294,13 +371,14 @@ void GameMaster::crew_turn() {
                 attack_team[i]->complete_turn();
 
             }
+*/
 
-            std::cout << "DEBUG-- Attack Team deals " << directed_damage << " directed damage." << std::endl; 
-            std::cout << "DEBUG-- Attack Team deals " << splash_damage << " splash damage." << std::endl; 
+            // std::cout << "DEBUG-- Attack Team deals " << directed_damage << " directed damage." << std::endl; 
+            // std::cout << "DEBUG-- Attack Team deals " << splash_damage << " splash damage." << std::endl; 
 
             // PERFORM THE ATTACK
-            if ( (directed_damage + splash_damage) >= targets[i]->getConstitution() ) 
-                targets[i]->kill();
+            // if ( (directed_damage + splash_damage) >= targets[i]->getConstitution() ) 
+            //     targets[i]->kill();
 
         }
             // RANDOMIZE TEAM SIZE
@@ -338,7 +416,7 @@ void GameMaster::crew_turn() {
 
     // RESET TURN FOR NEXT ROUND
     for ( int i=0; i<crew.size(); ++i )
-        static_cast< Crew* >( &crew[i] )->reset_turn();
+        static_cast< Actor* >( &crew[i] )->reset_turn();
 
 }
 
@@ -450,8 +528,9 @@ void GameMaster::monster_turn() {
     // Wake Up
 
 
+    // RESET TURN FOR NEXT ROUND
     for ( int i=0; i<monsters.size(); ++i )
-        static_cast< Monster* >( &monsters[i] )->reset_turn();
+        static_cast< Actor* >( &monsters[i] )->reset_turn();
 
 }
 
@@ -487,3 +566,262 @@ bool GameMaster::check_win_conditions() {
     return false;
 
 }
+
+void GameMaster::apply_attack( Actor& target, std::vector<Crew*>& attack_team ) {
+
+    std::cout << "--Resolving Attack--" << std::endl;
+
+    std::cout << "EVENT- Target is: " << target.getID() << " attack team is size: "
+        << attack_team.size() << std::endl;  
+
+    int hand_to_hand_strikes = 0;
+    std::vector<Weapon*> tested_weapon;
+    std::vector<Weapon*> untested_weapon;
+    
+    // MAKING ATTACK DECISIONS
+    for (int i=0; i<attack_team.size(); ++i) {
+
+        std::cout << "EVENT- " << attack_team[i]->getName() << " ";
+
+        bool is_using_weapon = false;
+        bool ranged_forced = (attack_team[i]->getLocation()->id != target.getLocation()->id);
+        std::cout << "DEBUG- attacker location id:" << attack_team[i]->getLocation()->id 
+                        << std::endl;        
+        std::cout << "DEBUG- target location id:" << target.getLocation()->id 
+                        << std::endl;
+        if ( ranged_forced )
+            std::cout << "DEBUG- ranged attack is forced." << std::endl;
+
+        if ( attack_team[i]->hasWeapon() ) {
+
+            std::uniform_int_distribution<int> range( 0, 1 );
+            is_using_weapon = range( mt_rand );
+            std::cout << " is armed, ";
+
+            if ( is_using_weapon || ranged_forced ) {
+
+                Weapon * weapon = attack_team[i]->getWeapon();
+                std::cout << "uses the " << weapon->getName() << ". It has "; 
+
+                if ( weapon->isTested() ) {
+                    // USE weapon with KNOWN effect
+                    tested_weapon.push_back( weapon );
+                    std::cout << "known "; 
+
+                } else {
+                    // USE weapon with UNKNOWN effect
+                    untested_weapon.push_back( weapon );
+                    std::cout << "unknown "; 
+
+                }
+
+                std::cout << "effects "; 
+
+            } else {
+                // Has weapon BUT USE Hand-to-Hand
+                hand_to_hand_strikes += attack_team[i]->getStrength();
+                std::cout << "but attacks hand-to-hand.";
+
+            }
+
+        } else {
+            // Does not have weapon USE Hand-to-Hand
+            hand_to_hand_strikes += attack_team[i]->getStrength();
+            std::cout << " is unarmed and attacks hand-to-hand."; 
+
+        }
+
+        std::cout << std::endl;
+
+        attack_team[i]->complete_turn();
+        std::cout  << "VERBOSE- " << attack_team[i]->getName() 
+                    << " is now unavailable until next turn" << std::endl; 
+
+    }
+    
+    int damage_dir = 0;
+    int damage_loc = 0;
+    int damage_exp = 0;
+
+    int stun_dir = 0;
+    int stun_loc = 0;
+    int stun_exp = 0;
+
+    int grow_dir = 0;
+    int grow_loc = 0;
+    int grow_exp = 0;
+
+    int shrink_dir = 0;
+    int shrink_loc = 0;
+    int shrink_exp = 0;
+    
+    int fragment_dir = 0;
+    int fragment_loc = 0;
+    int fragment_exp = 0;
+
+    // CALCULATING THE HAND TO HAND ATTACKS
+    damage_dir += roll_dice( hand_to_hand_strikes );
+    
+    // CALCULATING UNKNOWN EFFECTS
+    if ( untested_weapon.size() > 0 ) {
+
+        Effect * temp_effect = ActionGenerator::get_available_effect( effects );
+        untested_weapon[0]->assign_effect( *temp_effect );
+        std::cout << "EVENT- Weapon(" << untested_weapon[0]->getName() << ") is assigned the "
+                    << temp_effect->getName() << " effect." << std::endl;
+
+        for (int i=0; i<untested_weapon.size(); ++i)
+            tested_weapon.push_back( untested_weapon[0] );
+
+    }
+
+    // CALCULATING ALL KNOWN EFFECT ATTACKS
+    for (int i=0; i<tested_weapon.size(); ++i) {
+
+        Effect * effect = tested_weapon[i]->get_monster_effect();          
+        int roll_result = roll_dice( effect->get_dice_count() );
+
+        if ( effect->is_kill_type() ) {
+
+            if ( tested_weapon[i]->hasAreaEffect() ) {
+                damage_loc += roll_result;
+                if ( tested_weapon[i]->hasExpandingEffect() )
+                    damage_exp += roll_result;
+            } else {
+                damage_dir += roll_result;
+            }
+
+        } else if ( effect->is_stun_type() ) {
+
+            std::cout << "VERBOSE- " << tested_weapon[i]->hasAreaEffect();
+
+            if ( tested_weapon[i]->hasAreaEffect() ) {
+                stun_loc += roll_result;
+                if ( tested_weapon[i]->hasExpandingEffect() )
+                    stun_exp += roll_result;
+            } else {
+                stun_dir += roll_result;
+            }
+
+        } else if ( effect->is_grow_type() ) {
+
+            if ( tested_weapon[i]->hasAreaEffect() ) {
+                grow_loc += 1;
+                if ( tested_weapon[i]->hasExpandingEffect() )
+                    grow_exp += 1;
+            } else {
+                grow_dir += 1;
+            }
+        
+        } else if ( effect->is_shrink_type() ) {
+
+            if ( tested_weapon[i]->hasAreaEffect() ) {
+                shrink_loc += 1;
+                if ( tested_weapon[i]->hasExpandingEffect() )
+                    shrink_exp += 1;
+            } else {
+                shrink_dir += 1;
+            }
+        
+        } else if ( effect->is_frag_type() ) {
+
+            if ( tested_weapon[i]->hasAreaEffect() ) {
+                fragment_loc += roll_result;
+                if ( tested_weapon[i]->hasExpandingEffect() )
+                    fragment_exp += roll_result;
+            } else {
+                fragment_dir += roll_result;
+            }
+
+        }
+
+    }
+
+    std::cout << "ATTACK RESOLUTION________________________________________" << std::endl;
+    std::cout << "int damage_dir = " << damage_dir << std::endl;
+    std::cout << "int damage_loc = " << damage_loc << std::endl;
+    std::cout << "int damage_exp = " << damage_exp << std::endl;
+
+    std::cout << "int stun_dir = " << stun_dir << std::endl;
+    std::cout << "int stun_loc = " << stun_loc << std::endl;
+    std::cout << "int stun_exp = " << stun_exp << std::endl;
+
+    std::cout << "int grow_dir = " << grow_dir << std::endl;
+    std::cout << "int grow_loc = " << grow_loc << std::endl;
+    std::cout << "int grow_exp = " << grow_exp << std::endl;
+
+    std::cout << "int shrink_dir = " << shrink_dir << std::endl;
+    std::cout << "int shrink_loc = " << shrink_loc << std::endl;
+    std::cout << "int shrink_exp = " << shrink_exp << std::endl;
+
+    std::cout << "int fragment_dir = " << fragment_dir << std::endl;
+    std::cout << "int fragment_loc = " << fragment_loc << std::endl;
+    std::cout << "int fragment_exp = " << fragment_exp << std::endl;
+    std::cout << "_________________________________________________________" << std::endl;
+
+    if ( untested_weapon.size() > 1 ) {
+        untested_weapon[0]->remove_effect();
+        std::cout << "EVENT- Weapon(" << untested_weapon[0] << ") effect "
+            << " was removed for multiple unknown effect case." 
+            << std::endl;
+    }
+
+    std::cout << "Complete Attack" << std::endl;
+
+}
+
+// int GameMaster::resolve_attack(  ) {
+
+//     int total_dice = 3;
+//     return roll_dice( total_dice );
+
+// }
+
+int GameMaster::roll_dice( int n ) {
+
+    if ( n<1 )
+        return 0;
+
+    std::uniform_int_distribution<int> range( 1, 6 );
+    return range( mt_rand ) + roll_dice( n-1 );
+
+}
+
+
+//              for (int i=0; i<team_size; ++i) {
+
+//                 if ( attack_team[i]->hasWeapon() ) {
+
+//                     std::uniform_int_distribution<int> range( 0, 1 );
+//                     int use_weapon_choice = range( mt_rand );
+
+//                     if ( use_weapon_choice == 0 ) {
+
+//                         directed_damage += attack_team[i]->getStrength();
+
+//                     } else {
+
+//                         Weapon * attacker_weapon = attack_team[i]->getWeapon();
+//                         std::cout << "DEBUG-- Attacker USES " << attacker_weapon->getName() << 
+//                             std::endl;
+                        
+//                         if ( attacker_weapon->isDeployable() ) {
+//                             attacker_weapon->deploy( **it );
+//                         }
+
+//                         if ( attacker_weapon->hasAreaEffect() )
+//                             splash_damage += 15;
+//                         else
+//                             directed_damage += 10;
+
+//                     }
+
+//                 } else {
+
+//                     directed_damage += attack_team[i]->getStrength();
+
+//                 }
+
+//                 attack_team[i]->complete_turn();
+
+//             }

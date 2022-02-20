@@ -8,6 +8,7 @@ link: compile
 		entity.o actor.o crew.o monster.o weapon.o \
 		manifest.o \
 		location.o map.o \
+		effect.o \
 		action_generator.o \
 		attack_plan.o \
 		game_master.o \
@@ -19,6 +20,7 @@ compile:
 		entity.cc actor.cc crew.cc monster.cc weapon.cc \
 		manifest.cc \
 		location.cc map.cc \
+		effect.cc \
 		action_generator.cc \
 		attack_plan.cc \
 		game_master.cc \

@@ -10,6 +10,8 @@ namespace Initializer {
     void buildMonsters( Manifest& );
     void buildWeapons( Manifest& );
 
+    void buildEffects( std::vector<Effect*>& );
+
 };
 
 #endif

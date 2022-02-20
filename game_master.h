@@ -22,6 +22,7 @@ private:
     Manifest crew;
     Manifest monsters;
     Manifest weapons;
+    std::vector< Effect* > effects;
 
     bool running;
     int turn;
@@ -39,15 +40,24 @@ private:
 
     bool check_win_conditions();
 
+    void apply_attack( Actor&, std::vector<Crew*>& );
+    int resolve_damage( Effect& );
+
 public:
     GameMaster();
     GameMaster( int );
 
     void init();
     void run();
+
+    int roll_dice( int );
+
+
+
+    // PURE DEBUG
+
     void run_design();
-
-
+    void run_design_weapons();
 
 };
 

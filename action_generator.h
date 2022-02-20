@@ -50,6 +50,9 @@ namespace ActionGenerator {
 
     // Growth Options
     std::vector< std::string > get_growth_options( Manifest& );
+    Effect * get_available_effect( std::vector< Effect* >& );
+
+
 
 };
 

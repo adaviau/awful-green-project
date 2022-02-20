@@ -281,6 +281,9 @@ std::vector< Location* > ActionGenerator::shuffled_location_list( Map& m ) {
 std::vector< Crew* > 
     ActionGenerator::crew_that_can_attack( Location& l, Manifest& manifest ) {
 
+    // std::cout << "VERBOSE-- finding crew that can attack location " << 
+    //     l.getName() << std::endl;
+
     std::vector< Crew* > active = shuffled_crew_list( manifest );
     std::vector< Crew* > output;
 
@@ -288,25 +291,38 @@ std::vector< Crew* >
 
         if ( active[i]->canAttack() && active[i]->getLocation()->id == l.id ) {
             output.push_back( active[i] );
+            std::cout << "VERBOSE- crew[" << active[i]->getName() << "] is located in same place as target."
+                        << std::endl;
             continue;
+        } else {
+            std::cout << "VERBOSE- crew[" << active[i]->getName() << "] is not in the same place as target."
+                        << std::endl;
         }
         if ( active[i]->hasWeapon() && active[i]->getWeapon()->isRanged() ) {
+            std::cout << "VERBOSE- crew[" << active[i]->getName() << "] has a ranged weapon.";
+                        
+            bool had_sightline_debug_flag = false;
 
             for ( int i=0; i<l.room_sightlines.size(); ++i ) {
 
                 if ( active[i]->getLocation()->id == l.id ) {
                     output.push_back( active[i] );
+                    std::cout << " And has line of sight to target." << std::endl;
+                    had_sightline_debug_flag = true;
                     break;
                 }
 
             }
 
+            if ( had_sightline_debug_flag == false )
+                std::cout << " But no line of sight." << std::endl;
+
         }
 
     }
 
-    std::cout << "DEBUG-- " << output.size() << " crew can attack location " << 
-        l.getName() << std::endl;
+    // std::cout << "VERBOSE-- found " << output.size() << " crew can attack location " << 
+    //     l.getName() << std::endl;
 
     return output;
 
@@ -329,7 +345,16 @@ std::vector< Monster* >
 }
 
 
+Effect * ActionGenerator::get_available_effect( std::vector< Effect* >& m ) { 
 
+    std::shuffle( m.begin(), m.end(), random_engine() );
+    for (int i=0; i<m.size(); ++i)
+        if ( m[i]->is_available() )
+            return m[i];
+
+    return nullptr;
+
+}
 
 
 

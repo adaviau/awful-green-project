@@ -4,10 +4,12 @@
 
 Weapon::Weapon( std::string n ) : 
                     Entity( n, WEAPON ) {
+
     held = false;
     ranged = false;
     deployable = false;
     deployed = false;
+    tested = false;
     location = nullptr;
         
 }
@@ -32,9 +34,17 @@ void Weapon::set_deployable() {
 
 void Weapon::set_area_of_effect() { 
 
-    std::cout << "DEBUG - " << has_area_of_effect << std::endl;
+    std::cout << "DEBUG - is area effect weapon: " << has_area_of_effect << std::endl;
     has_area_of_effect = true; 
-    std::cout << "DEBUG - set_deployable: " << has_area_of_effect << std::endl;
+    std::cout << "DEBUG - set_area_of_effect: " << has_area_of_effect << std::endl;
+
+}
+
+void Weapon::set_expanding() { 
+
+    std::cout << "DEBUG - has expansion properties:" << expands << std::endl;
+    expands = true; 
+    std::cout << "DEBUG - set_expanding: " << expands << std::endl;
 
 }
 
@@ -53,13 +63,40 @@ void Weapon::drop( Location& l ) {
 
 }
 
-void Weapon::deploy( Location& l ) {     
+void Weapon::deploy( Location& l ) {
 
     if ( deployable ) 
         deployed = true;
     drop( l );
 
 }
+
+void Weapon::assign_effect( Effect& e ) {
+    
+    if ( monster_effect ) {
+        std::cout << "ERROR: Weapon already has assignment" << std::endl; 
+        return;
+    }
+    monster_effect = &e;
+    e.set_unavailable();
+    tested = true;
+    
+}
+
+void Weapon::remove_effect( ) {    
+    
+    monster_effect->set_available();
+    monster_effect = nullptr;
+    tested = false;
+    
+}
+
+
+bool Weapon::isTested() { return tested; };
+
+Effect * Weapon::get_regular_effect( ) {  return regular_effect;   }
+
+Effect * Weapon::get_monster_effect( ) {  return monster_effect;   }
 
 bool Weapon::isHeld() {     return held;   }
 
@@ -70,6 +107,8 @@ bool Weapon::isDeployable() {     return deployable;   }
 bool Weapon::isDeployed() {     return deployed;   }
 
 bool Weapon::hasAreaEffect() {  return has_area_of_effect;  }
+
+bool Weapon::hasExpandingEffect() {  return expands;  }
 
 
 // void Weapon::pickup( Actor& a ) {

@@ -71,8 +71,8 @@ void Initializer::buildCrew( Manifest& m ) {
     Crew * allison = new Crew( "Allison" );
     Crew * victoria = new Crew( "Victoria" );
     std::cout << "Default Vic can move " << victoria->getMovement() << " places\n";
-    victoria->setStats( 3, 27, 3 );
-    andrew->setStats( 2, 19, 3 );
+    victoria->setStats( 3, 27, 1 );
+    andrew->setStats( 2, 19, 2 );
     allison->setStats( 1, 15, 3 );
     denis->setStats( 1, 11, 4 );
     std::cout << "Set Vic can move " << victoria->getMovement() << " places\n";
@@ -117,12 +117,40 @@ void Initializer::buildWeapons( Manifest& m ) {
     Weapon * electric_fence = new Weapon( "Electic Fence" );
     Weapon * pool_queue = new Weapon( "Pool Queue" );
 
-    electric_fence->set_deployable();
+    electric_fence->set_deployable();    
+    laser->set_area_of_effect();
+    laser->set_ranged();
 
     m.add( *laser );
     m.add( *rifle );
     m.add( *pistol );
     m.add( *electric_fence );
     m.add( *pool_queue );
+
+}
+
+void Initializer::buildEffects( std::vector<Effect*>& m ) {
+
+    m.push_back( new Effect( _5_DICE_TO_KILL ) );
+    m.push_back( new Effect( _5_DICE_TO_KILL ) );
+
+    m.push_back( new Effect( _4_DICE_TO_KILL ) );
+    m.push_back( new Effect( _4_DICE_TO_KILL ) );
+
+    m.push_back( new Effect( _3_DICE_TO_KILL ) );
+    m.push_back( new Effect( _3_DICE_TO_KILL ) );
+
+    m.push_back( new Effect( _5_DICE_TO_STUN ) );
+
+    m.push_back( new Effect( _NO_EFFECT ) );
+    m.push_back( new Effect( _NO_EFFECT ) );
+
+    m.push_back( new Effect( _GROW ) );
+
+    m.push_back( new Effect( _SHRINK ) );
+
+    m.push_back( new Effect( _1_DIE_FRAGMENTS ) );
+    m.push_back( new Effect( _1_DIE_FRAGMENTS ) );
+    m.push_back( new Effect( _1_DIE_FRAGMENTS ) );
 
 }
