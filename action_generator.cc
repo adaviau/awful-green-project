@@ -289,7 +289,13 @@ std::vector< Crew* >
 
     for ( int i=0; i<active.size(); ++i ) {
 
-        if ( active[i]->canAttack() && active[i]->getLocation()->id == l.id ) {
+        if ( !active[i]->canAttack() ) { 
+            std::cout << "VERBOSE- crew[" << active[i]->getName() << "] cannot attack."
+                        << std::endl;
+            continue;
+        }
+
+        if ( active[i]->getLocation()->id == l.id ) {
             output.push_back( active[i] );
             std::cout << "VERBOSE- crew[" << active[i]->getName() << "] is located in same place as target."
                         << std::endl;

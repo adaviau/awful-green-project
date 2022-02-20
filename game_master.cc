@@ -155,6 +155,7 @@ void GameMaster::run_design() {
 void GameMaster::run() {
 
     crew_discovers_monsters();
+    crew_turn();
 
     while ( ++turn <= max_turns ) {
 
@@ -175,6 +176,8 @@ void GameMaster::crew_turn() {
     // GRAB, MOVE, ATTACK, WAKE
 
     std::cout << "\nTurn " << turn << " ------------- CREWMEN" << std::endl;
+    crew.debug();
+    std::cout << "------------------------- CREWMEN" << std::endl;
     
     std::cout << "\n******** PICKUP PHASE ******" << std::endl;
     std::vector< Crew* > list = ActionGenerator::shuffled_crew_list( crew );
@@ -296,6 +299,14 @@ void GameMaster::crew_turn() {
         std::cout << "VERBOSE- generating target(s) list" << std::endl;
         std::vector< Monster* > targets = ActionGenerator::get_monster_targets_near( **it, map );
 
+        if ( targets.size() < 1 ) {
+            std::cout << "STATE-- " << "There are " << targets.size() << " target(s) in the " 
+                        << (*it)->getName() << std::endl;
+            continue;
+        }
+
+
+
         // GET ALL CREW THAT CAN ATTACK HERE
         std::cout << "VERBOSE- generating attacker(s) list" << std::endl;
         std::vector< Crew* > attackers = ActionGenerator::crew_that_can_attack( **it, crew );
@@ -303,6 +314,10 @@ void GameMaster::crew_turn() {
         std::cout << "STATE-- " << "There are " << targets.size() << " target(s) and " << 
             attackers.size() << " attacker(s)" << " in the " << (*it)->getName() << std::endl;  
         
+        if ( attackers.size() < 1 ) {
+            continue;
+        }
+
         // DEAL WITH TARGETS ONE AT A TIME
         for (int i=0; i<targets.size() && attackers.size()>0; ++i) {
 
@@ -314,7 +329,6 @@ void GameMaster::crew_turn() {
                 std::cout << "DEBUG-- " << "No Attack team for this enemy." << std::endl;
                 continue;
             }
-
 
             std::cout << "DEBUG-- " << "Building attack team of size " << team_size <<
                 " from " << attackers.size() << " available attackers." << std::endl;
@@ -472,7 +486,7 @@ void GameMaster::monster_turn() {
         std::vector< Crew* > targets = ActionGenerator::get_crew_targets( **it, map );
 
         // GET ALL MONSTERS THAT CAN ATTACK HERE
-        std::vector< Monster* > attackers = ActionGenerator::monsters_that_can_attack( **it, crew );
+        std::vector< Monster* > attackers = ActionGenerator::monsters_that_can_attack( **it, monsters );
 
         std::cout << "DEBUG-- " << "There are " << targets.size() << " target(s) and " << 
             attackers.size() << " attacker(s)" << " in the " << (*it)->getName() << std::endl;  

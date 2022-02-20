@@ -68,12 +68,12 @@ void Initializer::buildCrew( Manifest& m ) {
 
     Crew * andrew = new Crew( "Andrew" );
     Crew * denis = new Crew( "Denis" );
-    Crew * allison = new Crew( "Allison" );
+    Crew * evan = new Crew( "Evan" );
     Crew * victoria = new Crew( "Victoria" );
     std::cout << "Default Vic can move " << victoria->getMovement() << " places\n";
     victoria->setStats( 3, 27, 1 );
     andrew->setStats( 2, 19, 2 );
-    allison->setStats( 1, 15, 3 );
+    evan->setStats( 1, 15, 3 );
     denis->setStats( 1, 11, 4 );
     std::cout << "Set Vic can move " << victoria->getMovement() << " places\n";
 
@@ -84,7 +84,7 @@ void Initializer::buildCrew( Manifest& m ) {
 
     m.add( *andrew );
     m.add( *denis );
-    m.add( *allison );
+    m.add( *evan );
     m.add( *victoria );
 
 }

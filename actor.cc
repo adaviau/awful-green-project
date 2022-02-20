@@ -26,7 +26,7 @@ int Actor::getConstitution() { return constitution; }
 
 bool Actor::isStunned() { return stunned; }
 bool Actor::isActive() { return active; }
-bool Actor::canAttack() { return !turn_used && active && !stunned; }
+bool Actor::canAttack() { return active && !stunned && !turn_used ; }
 void Actor::complete_turn() {   turn_used = true;   }
 void Actor::reset_turn() {   turn_used = false;   }
 
