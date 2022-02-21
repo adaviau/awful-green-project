@@ -295,7 +295,9 @@ std::vector< Crew* >
             continue;
         }
 
-        if ( active[i]->getLocation()->id == l.id ) {
+        int crew_map_idx = active[i]->getLocation()->map_idx;
+
+        if ( crew_map_idx == l.map_idx ) {
             output.push_back( active[i] );
             std::cout << "VERBOSE- crew[" << active[i]->getName() << "] is located in same place as target."
                         << std::endl;
@@ -309,9 +311,14 @@ std::vector< Crew* >
                         
             bool had_sightline_debug_flag = false;
 
-            for ( int i=0; i<l.room_sightlines.size(); ++i ) {
+            std::cout << "    Sightlines: ";
+            for ( auto ids: l.room_sightlines )
+                std::cout << ids << ' ';
+            std::cout << " : CrewMapIDX: " << crew_map_idx << std::endl;
 
-                if ( active[i]->getLocation()->id == l.id ) {
+            for ( int j=0; j<l.room_sightlines.size(); ++j ) {
+
+                if ( crew_map_idx == l.room_sightlines[j] ) {
                     output.push_back( active[i] );
                     std::cout << " And has line of sight to target." << std::endl;
                     had_sightline_debug_flag = true;
