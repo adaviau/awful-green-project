@@ -149,7 +149,8 @@ std::vector< Crew* > ActionGenerator::get_crew_targets( Location& l, Map& m ) {
     std::vector< Crew* > output;
 
     for ( int i=0; i<temp.size(); ++i )
-        output.push_back( static_cast< Crew* >( temp[i] ) );
+        if ( static_cast< Crew* >( temp[i] )->isAlive() ) 
+            output.push_back( static_cast< Crew* >( temp[i] ) );
 
     return output;
 
@@ -192,7 +193,8 @@ std::vector< Monster* > ActionGenerator::get_monster_targets_near( Location& l, 
     std::vector< Monster* > output;
 
     for ( int i=0; i<temp.size(); ++i )
-        output.push_back( static_cast< Monster* >( temp[i] ) );
+        if ( static_cast< Monster* >( temp[i] )->isAlive() ) 
+            output.push_back( static_cast< Monster* >( temp[i] ) );
 
     return output;
 
@@ -239,7 +241,7 @@ std::vector< Crew* > ActionGenerator::shuffled_crew_list( Manifest& m ) {
     
     for ( int i=0; i<m.size(); ++i ) {
         Crew * ptr = static_cast< Crew* >( &m[i] );
-        if ( ptr->isActive() && !ptr->isStunned() )
+        if ( ptr->isAlive() && !ptr->isStunned() )
             output.push_back( ptr );
     }
     std::shuffle( output.begin(), output.end(), random_engine() );
@@ -252,7 +254,7 @@ std::vector< Monster* > ActionGenerator::shuffled_monster_list( Manifest& m ) {
     
     for ( int i=0; i<m.size(); ++i ) {
         Monster * ptr = static_cast< Monster* >( &m[i] );
-        if ( ptr->isActive() && !ptr->isStunned() )
+        if ( ptr->isAlive() && !ptr->isStunned() )
             output.push_back( ptr );
     }
     if ( output.size() )

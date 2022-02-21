@@ -8,6 +8,7 @@ Actor::Actor( std::string n, ENTITY_TYPE t ) : Entity( n, t ) {
     location = nullptr;
     stunned = false;
     turn_used = false;
+    alive = true;
 }
 
 Actor::Actor( std::string n, ENTITY_TYPE t,  Location& l ) : Actor( n, t ) { }
@@ -25,11 +26,11 @@ int Actor::getStrength() { return strength; }
 int Actor::getConstitution() { return constitution; }
 
 bool Actor::isStunned() { return stunned; }
-bool Actor::isActive() { return active; }
-bool Actor::canAttack() { return active && !stunned && !turn_used ; }
+bool Actor::isAlive() { return alive; }
+bool Actor::canAttack() { return alive && !stunned && !turn_used ; }
 void Actor::complete_turn() {   turn_used = true;   }
 void Actor::reset_turn() {   turn_used = false;   }
 
 void Actor::stun() { stunned = true; }
 void Actor::wakeup() { stunned = false; }
-void Actor::kill() { active = false; }
+void Actor::kill() { alive = false; }

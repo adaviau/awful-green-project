@@ -8,7 +8,7 @@ void test_monster_grow() {
 
         Monster * m = static_cast< Monster* >( &monsters[i] );
         std::cout << "Monster[" << m->getID() << "]: " 
-                    << m->getName() << " is " << m->isActive()
+                    << m->getName() << " is " << m->isAlive()
                     << std::endl;
 
     }

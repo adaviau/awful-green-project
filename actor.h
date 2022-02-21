@@ -13,7 +13,7 @@ private:
 
 protected:
     bool stunned;
-    bool active;
+    bool alive;
     bool turn_used;
 
 public:
@@ -23,7 +23,7 @@ public:
 
     void setStats( int, int, int );
     bool isStunned();
-    bool isActive();
+    bool isAlive();
     bool canAttack();
     bool canGrabWeapon();
 

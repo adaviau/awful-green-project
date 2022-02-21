@@ -2,9 +2,16 @@
 
 #include "game_master.h"
 
-GameMaster::GameMaster() : turn( 0 ), max_turns( 500 ) { }
+GameMaster::GameMaster() : GameMaster( 500 ) { }
 
-GameMaster::GameMaster( int turn_option ) : turn( 0 ), max_turns( turn_option ) { }
+GameMaster::GameMaster( int turn_option ) : turn( 0 ), max_turns( turn_option ) {
+
+    max_fragment_monsters = 3;
+    max_egg_monsters = 3;
+    max_baby_monsters = 3;
+    max_adult_monsters = 3;
+
+}
 
 void GameMaster::init() {
 
@@ -48,6 +55,44 @@ void GameMaster::weapon_placement() {
     Weapon * fence = static_cast< Weapon* >( &weapons[3] );
     // std::cout << "is fence deployable " << fence->isDeployable() << std::endl;
     // fence->deploy( map[8] );
+
+}
+
+void GameMaster::run_design_grow() {
+
+    for ( int i=0; i<10; ++i ) {
+
+        monsters.debug();
+
+        std::cout << std::endl << monster_limit_reached( "FRAGMENT" ) << std::endl;
+        std::cout << monster_limit_reached( "EGG" ) << std::endl;
+        std::cout << monster_limit_reached( "BABY" ) << std::endl;
+        std::cout << monster_limit_reached( "ADULT" ) << std::endl;
+
+        grow_monster( *( static_cast< Monster* >( &monsters[0] ) ) );
+
+    }
+
+    int alive_count = 0;
+    for ( int i=0; i<map.size(); ++i ) {
+        alive_count += ActionGenerator::get_monster_targets_near( map[i], map ).size();
+    }
+    std::cout << " Monster Alive Count: " << alive_count << std::endl;
+
+    static_cast< Monster* >( &monsters[0] )->kill();
+    
+    alive_count = 0;
+    for ( int i=0; i<map.size(); ++i ) {
+        alive_count += ActionGenerator::get_monster_targets_near( map[i], map ).size();
+    }
+    std::cout << " Monster Alive Count: " << alive_count << std::endl;
+
+    monsters.debug();
+    std::cout << std::endl << monster_limit_reached( "FRAGMENT" ) << std::endl;
+    std::cout << monster_limit_reached( "EGG" ) << std::endl;
+    std::cout << monster_limit_reached( "BABY" ) << std::endl;
+    std::cout << monster_limit_reached( "ADULT" ) << std::endl;
+    
 
 }
 
@@ -305,8 +350,6 @@ void GameMaster::crew_turn() {
             continue;
         }
 
-
-
         // GET ALL CREW THAT CAN ATTACK HERE
         std::cout << "VERBOSE- generating attacker(s) list" << std::endl;
         std::vector< Crew* > attackers = ActionGenerator::crew_that_can_attack( **it, crew );
@@ -341,87 +384,12 @@ void GameMaster::crew_turn() {
             std::cout << "DEBUG-- " << "Team attacking " << targets[i]->getName() << 
                 " is of size " << attack_team.size() << std::endl;
             
-            // CALCULATE DAMAGES FROM ATTACK TEAM
+            // APPLY ATTACKS
             apply_attack( *targets[i], attack_team );
 
-/*
-            int directed_damage = 0;
-            int splash_damage = 0;
-
-            for (int i=0; i<team_size; ++i) {
-
-                if ( attack_team[i]->hasWeapon() ) {
-
-                    std::uniform_int_distribution<int> range( 0, 1 );
-                    int use_weapon_choice = range( mt_rand );
-
-                    if ( use_weapon_choice == 0 ) {
-
-                        directed_damage += attack_team[i]->getStrength();
-
-                    } else {
-
-                        Weapon * attacker_weapon = attack_team[i]->getWeapon();
-                        std::cout << "DEBUG-- Attacker USES " << attacker_weapon->getName() << 
-                            std::endl;
-                        
-                        if ( attacker_weapon->isDeployable() ) {
-                            attacker_weapon->deploy( **it );
-                        }
-
-                        if ( attacker_weapon->hasAreaEffect() )
-                            splash_damage += 15;
-                        else
-                            directed_damage += 10;
-
-                    }
-
-                } else {
-
-                    directed_damage += attack_team[i]->getStrength();
-
-                }
-
-                attack_team[i]->complete_turn();
-
-            }
-*/
-
-            // std::cout << "DEBUG-- Attack Team deals " << directed_damage << " directed damage." << std::endl; 
-            // std::cout << "DEBUG-- Attack Team deals " << splash_damage << " splash damage." << std::endl; 
-
-            // PERFORM THE ATTACK
-            // if ( (directed_damage + splash_damage) >= targets[i]->getConstitution() ) 
-            //     targets[i]->kill();
-
         }
-            // RANDOMIZE TEAM SIZE
-            // MAKE TEAM FROM LAST 
-
-
 
     }
-
-                    // for (auto it = list.begin(); it != list.end(); ++it) {
-
-                    //     std::vector< Monster* > attack_options;
-                    //     Location *crew_location = (*it)->getLocation();
-
-                    //     // Get the attack options
-                    //     if ( (*it)->hasWeapon() && (*it)->getWeapon()->isRanged() )
-                    //         attack_options = ActionGenerator::get_monster_targets_ranged( *crew_location, map );
-                    //     else
-                    //         attack_options = ActionGenerator::get_monster_targets_near( *crew_location, map );
-                        
-                    //     if ( (*it)->hasWeapon() )
-                    //         std::cout << (*it)->getName() << " has ranged weapon? " << (*it)->getWeapon()->isRanged() << std::endl;
-                    //     std::cout << "There are " << attack_options.size() << " attack options" << std::endl;
-
-                    //     std::uniform_int_distribution<int> range( 0, attack_options.size() );
-                    //     int action_choice = range( mt_rand );
-                    //     std::cout << " Selecting attack option: " << action_choice << std::endl;
-                        
-                    // }
 
     // std::cout << "--Wake Up Phase" << std::endl;
     // Wake Up
@@ -562,7 +530,7 @@ bool GameMaster::check_win_conditions() {
     int crew_remaining = 0;
 
     for ( int i=0; i<monsters.size(); ++i )
-        if ( static_cast< Actor* >( &monsters[i] )->isActive() )
+        if ( static_cast< Actor* >( &monsters[i] )->isAlive() )
             ++monsters_remaining;
     if ( monsters_remaining == 0 ) {
         std::cout << "CREW WINS THE GAME" << std::endl;
@@ -570,7 +538,7 @@ bool GameMaster::check_win_conditions() {
     }
 
     for ( int i=0; i<crew.size(); ++i )
-        if ( static_cast< Actor* >( &crew[i] )->isActive() )
+        if ( static_cast< Actor* >( &crew[i] )->isAlive() )
             ++crew_remaining;
     if ( crew_remaining == 0 ) {
         std::cout << "MONSTERS WINS THE GAME" << std::endl;
@@ -781,6 +749,77 @@ void GameMaster::apply_attack( Actor& target, std::vector<Crew*>& attack_team ) 
     }
 
     std::cout << "Complete Attack" << std::endl;
+
+}
+
+bool GameMaster::monster_limit_reached( std::string stage ) {
+
+    int count = 0;
+    int max_count = -1;
+
+    if ( stage == "FRAGMENT" )
+        max_count = max_fragment_monsters;
+    else if ( stage == "EGG" )
+        max_count = max_egg_monsters;
+    else if ( stage == "BABY" )
+        max_count = max_baby_monsters;
+    else if ( stage == "ADULT" ) 
+        max_count = max_adult_monsters;
+
+    for ( int i=0; i<monsters.size(); ++i ) {
+
+        Monster * cursor = static_cast< Monster* >( &monsters[i] );
+        if ( cursor->isAlive() && stage == cursor->getStage() )
+            ++count;
+
+    }
+
+    std::cout << "DEBUG- for " << stage << " stage, count: " << count << " max: " << max_count
+                << std::endl;
+
+    return count >= max_count;
+
+}
+
+void GameMaster::grow_monster( Monster& monster ) {
+
+    std::cout << "VERBOSE- Attempting to grow Monster(" << monster.getID() << ")"
+                    << std::endl;
+
+    if ( monster_limit_reached( monster.getStage() ) ) {
+        std::cout << "VERBOSE- Monster limit reached. Monster(" << monster.getID() << ")"
+                    << " cannot grow" << std::endl;
+        return;
+    }
+
+    if ( monster.getStage() == "ADULT" ) {
+
+        std::cout << "VERBOSE- Adult Monster attemping to lay an EGG " << std::endl;
+        if ( monster_limit_reached( "EGG" ) ) {
+
+            std::cout << "VERBOSE- Egg limit reached" << std::endl;
+
+        } else {
+
+            Entity * created_egg = new Monster( "EGG" );      
+            created_egg->enter( *monster.getLocation() );
+
+            monsters.add( *created_egg );
+
+            std::cout << "VERBOSE- Monster layed an egg" << std::endl;
+        }
+
+    } else {
+
+        monster.grow();
+
+    }
+
+}
+
+void GameMaster::grow_monsters( std::string stage ) {
+
+
 
 }
 

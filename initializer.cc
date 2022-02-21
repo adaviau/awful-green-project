@@ -96,10 +96,6 @@ void Initializer::buildMonsters( Manifest& m ) {
     Monster * baby = new Monster( "BABY" );
     Monster * adult = new Monster( "ADULT" );
 
-    fragment->activate();
-    adult->activate();
-    egg->activate();
-    baby->activate();
     // adult->stun();
 
     m.add( *fragment );

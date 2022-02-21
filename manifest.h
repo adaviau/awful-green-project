@@ -4,7 +4,7 @@
 #include <vector>
 #include <fstream>
 
-#include "entity.h"
+#include "actor.h"
 
 class Manifest {
 

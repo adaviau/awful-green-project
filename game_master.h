@@ -28,6 +28,11 @@ private:
     int turn;
     int max_turns;
 
+    int max_fragment_monsters;
+    int max_egg_monsters;
+    int max_baby_monsters;
+    int max_adult_monsters;
+
     std::mt19937 mt_rand;
 
     void crew_placement();
@@ -39,6 +44,10 @@ private:
     void monster_turn();
 
     bool check_win_conditions();
+
+    bool monster_limit_reached( std::string );
+    void grow_monster( Monster& );
+    void grow_monsters( std::string );
 
     void apply_attack( Actor&, std::vector<Crew*>& );
     int resolve_damage( Effect& );
@@ -58,6 +67,7 @@ public:
 
     void run_design();
     void run_design_weapons();
+    void run_design_grow();
 
 };
 
