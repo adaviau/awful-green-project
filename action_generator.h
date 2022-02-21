@@ -42,6 +42,8 @@ namespace ActionGenerator {
     std::vector< Crew* > crew_that_can_attack( Location&, Manifest& );
     std::vector< Monster* > monsters_that_can_attack( Location&, Manifest& );
 
+    std::vector< Monster* > get_monsters_of_stage( std::string, Manifest& ); 
+
     void get_crew_attack_options( );
     std::vector< Crew* > create_attack_parties( );
     std::vector< Actor* > get_location_attackers( ENTITY_TYPE, Location&, Manifest& );

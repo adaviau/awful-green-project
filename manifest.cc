@@ -30,7 +30,8 @@ void Manifest::debug() {
     std::cout << "\nMANIFEST DEBUG - Size: " << size() << "\n";
     for (int i=0; i<size(); ++i) {
 
-        std::cout << "Entity[" << entities[i]->getName();
+        std::cout << "Entity[" << entities[i]->getName() << "("; 
+        std::cout << entities[i]->getID() << ")";
 
         if ( entities[i]->getType() == CREW || entities[i]->getType() == MONSTER ) {
 

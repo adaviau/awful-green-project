@@ -359,6 +359,20 @@ std::vector< Monster* >
 
 }
 
+std::vector< Monster* > 
+    ActionGenerator::get_monsters_of_stage( std::string stage, Manifest& m ) { 
+
+    std::vector< Monster* > active = shuffled_monster_list( m );
+    std::vector< Monster* > output;
+
+    for ( int i=0; i<active.size(); ++i ) 
+        if ( active[i]->getStage() == stage ) 
+            output.push_back( active[i] );
+
+    return output;
+
+}
+
 
 Effect * ActionGenerator::get_available_effect( std::vector< Effect* >& m ) { 
 
@@ -371,6 +385,48 @@ Effect * ActionGenerator::get_available_effect( std::vector< Effect* >& m ) {
 
 }
 
+// Determines which Monsters are available to grow
+// does not take into consideration type maximums
+std::vector< std::string > ActionGenerator::get_growth_options( Manifest& m ) {
+
+    std::vector< Monster* > active = shuffled_monster_list( m );
+    std::vector< std::string > output;
+
+    bool flag_fragment = false;
+    bool flag_egg = false;
+    bool flag_baby = false;
+    bool flag_adult = false;
+
+    for ( int i=0; i<active.size(); ++i ) {
+        std::string cursor_stage = static_cast< Monster* >( &m[i] )->getStage();
+        if ( !flag_fragment && cursor_stage == "FRAGMENT" ) {
+
+            output.push_back( "FRAGMENT" ); 
+            flag_fragment = true;
+
+        } else if ( !flag_egg && cursor_stage == "EGG" ) {
+
+            output.push_back( "EGG" ); 
+            flag_egg = true;
+
+        } else if ( !flag_baby && cursor_stage == "BABY" ) {
+
+            output.push_back( "BABY" ); 
+            flag_baby = true;
+
+        } else if ( !flag_adult && cursor_stage == "ADULT" ) {
+
+            output.push_back( "ADULT" ); 
+            flag_adult = true;
+
+        }
+    }
+
+    // std::cout << "REACHED\n";
+    std::shuffle( output.begin(), output.end(), random_engine() );
+    return output;
+
+}
 
 
 

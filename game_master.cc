@@ -7,7 +7,7 @@ GameMaster::GameMaster() : GameMaster( 500 ) { }
 GameMaster::GameMaster( int turn_option ) : turn( 0 ), max_turns( turn_option ) {
 
     max_fragment_monsters = 3;
-    max_egg_monsters = 3;
+    max_egg_monsters = 15;
     max_baby_monsters = 3;
     max_adult_monsters = 3;
 
@@ -60,39 +60,49 @@ void GameMaster::weapon_placement() {
 
 void GameMaster::run_design_grow() {
 
-    for ( int i=0; i<10; ++i ) {
+    // for ( int i=0; i<10; ++i ) {
 
-        monsters.debug();
+    //     monsters.debug();
 
-        std::cout << std::endl << monster_limit_reached( "FRAGMENT" ) << std::endl;
-        std::cout << monster_limit_reached( "EGG" ) << std::endl;
-        std::cout << monster_limit_reached( "BABY" ) << std::endl;
-        std::cout << monster_limit_reached( "ADULT" ) << std::endl;
+    //     std::cout << std::endl << monster_limit_reached( "FRAGMENT" ) << std::endl;
+    //     std::cout << monster_limit_reached( "EGG" ) << std::endl;
+    //     std::cout << monster_limit_reached( "BABY" ) << std::endl;
+    //     std::cout << monster_limit_reached( "ADULT" ) << std::endl;
 
-        grow_monster( *( static_cast< Monster* >( &monsters[0] ) ) );
+    //     grow_monster( *( static_cast< Monster* >( &monsters[0] ) ) );
 
-    }
+    // }
 
-    int alive_count = 0;
-    for ( int i=0; i<map.size(); ++i ) {
-        alive_count += ActionGenerator::get_monster_targets_near( map[i], map ).size();
-    }
-    std::cout << " Monster Alive Count: " << alive_count << std::endl;
+    // int alive_count = 0;
+    // for ( int i=0; i<map.size(); ++i ) {
+    //     alive_count += ActionGenerator::get_monster_targets_near( map[i], map ).size();
+    // }
+    // std::cout << " Monster Alive Count: " << alive_count << std::endl;
 
-    static_cast< Monster* >( &monsters[0] )->kill();
+    // static_cast< Monster* >( &monsters[0] )->kill();
     
-    alive_count = 0;
-    for ( int i=0; i<map.size(); ++i ) {
-        alive_count += ActionGenerator::get_monster_targets_near( map[i], map ).size();
-    }
-    std::cout << " Monster Alive Count: " << alive_count << std::endl;
+    // alive_count = 0;
+    // for ( int i=0; i<map.size(); ++i ) {
+    //     alive_count += ActionGenerator::get_monster_targets_near( map[i], map ).size();
+    // }
+    // std::cout << " Monster Alive Count: " << alive_count << std::endl;
 
+    // monsters.debug();
+    // std::cout << std::endl << monster_limit_reached( "FRAGMENT" ) << std::endl;
+    // std::cout << monster_limit_reached( "EGG" ) << std::endl;
+    // std::cout << monster_limit_reached( "BABY" ) << std::endl;
+    // std::cout << monster_limit_reached( "ADULT" ) << std::endl;
+
+
+
+    // monsters.debug();
+    // grow_monsters();
     monsters.debug();
-    std::cout << std::endl << monster_limit_reached( "FRAGMENT" ) << std::endl;
-    std::cout << monster_limit_reached( "EGG" ) << std::endl;
-    std::cout << monster_limit_reached( "BABY" ) << std::endl;
-    std::cout << monster_limit_reached( "ADULT" ) << std::endl;
-    
+
+    for ( int i=0; i<100; ++i ) {
+        grow_monsters();
+        monsters.debug();
+    }
 
 }
 
@@ -752,6 +762,7 @@ void GameMaster::apply_attack( Actor& target, std::vector<Crew*>& attack_team ) 
 
 }
 
+// Return true if limit is reached
 bool GameMaster::monster_limit_reached( std::string stage ) {
 
     int count = 0;
@@ -768,6 +779,7 @@ bool GameMaster::monster_limit_reached( std::string stage ) {
 
     for ( int i=0; i<monsters.size(); ++i ) {
 
+        // FLAG this can be changed to get shuffled list
         Monster * cursor = static_cast< Monster* >( &monsters[i] );
         if ( cursor->isAlive() && stage == cursor->getStage() )
             ++count;
@@ -781,12 +793,37 @@ bool GameMaster::monster_limit_reached( std::string stage ) {
 
 }
 
+// return true if stage can grow
+bool GameMaster::monster_can_grow( std::string stage ) {
+
+    if ( stage == "FRAGMENT" )
+        return !monster_limit_reached( "BABY" );
+    else if ( stage == "EGG" )
+        return !monster_limit_reached( "BABY" );
+    else if ( stage == "BABY" )
+        return !monster_limit_reached( "ADULT" );
+    else if ( stage == "ADULT" ) 
+        return !monster_limit_reached( "EGG" );
+
+    return false;
+
+}
+
+bool GameMaster::monster_can_grow( Monster& monster ) {
+
+    return monster_can_grow( monster.getStage() );
+
+}
+
+// Remove the prevention checks for this function because they are redundant
 void GameMaster::grow_monster( Monster& monster ) {
 
     std::cout << "VERBOSE- Attempting to grow Monster(" << monster.getID() << ")"
                     << std::endl;
 
-    if ( monster_limit_reached( monster.getStage() ) ) {
+    bool can_grow = monster_can_grow( monster );
+
+    if ( !can_grow ) {
         std::cout << "VERBOSE- Monster limit reached. Monster(" << monster.getID() << ")"
                     << " cannot grow" << std::endl;
         return;
@@ -795,19 +832,13 @@ void GameMaster::grow_monster( Monster& monster ) {
     if ( monster.getStage() == "ADULT" ) {
 
         std::cout << "VERBOSE- Adult Monster attemping to lay an EGG " << std::endl;
-        if ( monster_limit_reached( "EGG" ) ) {
+        
+        Entity * created_egg = new Monster( "EGG" );      
+        created_egg->enter( *monster.getLocation() );
+        monsters.add( *created_egg );
 
-            std::cout << "VERBOSE- Egg limit reached" << std::endl;
-
-        } else {
-
-            Entity * created_egg = new Monster( "EGG" );      
-            created_egg->enter( *monster.getLocation() );
-
-            monsters.add( *created_egg );
-
-            std::cout << "VERBOSE- Monster layed an egg" << std::endl;
-        }
+        std::cout << "VERBOSE- Monster layed an egg" << std::endl;
+        
 
     } else {
 
@@ -817,9 +848,38 @@ void GameMaster::grow_monster( Monster& monster ) {
 
 }
 
-void GameMaster::grow_monsters( std::string stage ) {
+void GameMaster::grow_monsters( ) {
 
+    std::cout << "VERBOSE- Generate growth options" << std::endl;
+    std::vector< std::string > options = ActionGenerator::get_growth_options( monsters );
+    std::cout << "VERBOSE- Found " << options.size() << " options" << std::endl;
 
+    for ( int i=0; i<options.size(); ++i ) {
+
+        std::cout << "VERBOSE- Checking if " << options[i] << " can grow" << std::endl;
+        if ( monster_can_grow( options[i] ) ) {
+        
+            std::cout << "VERBOSE- Growing " << options[i] << " is allowed" << std::endl;
+            std::vector< Monster* > growth_targets; 
+            growth_targets = ActionGenerator::get_monsters_of_stage( options[i], monsters );
+            for ( int j=0; j<growth_targets.size(); ++j ) {
+
+                grow_monster( *growth_targets[j] );
+            
+            }
+
+            return;
+
+        } else {
+
+            std::cout << "VERBOSE- " << options[i] << " is maxed. Trying another option" 
+                        << std::endl;
+
+        }
+
+    }
+
+    std::cout << "VERBOSE- No growing could be performed" << std::endl;
 
 }
 

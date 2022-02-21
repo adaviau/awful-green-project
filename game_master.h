@@ -46,8 +46,10 @@ private:
     bool check_win_conditions();
 
     bool monster_limit_reached( std::string );
+    bool monster_can_grow( std::string );
+    bool monster_can_grow( Monster& );
     void grow_monster( Monster& );
-    void grow_monsters( std::string );
+    void grow_monsters( );
 
     void apply_attack( Actor&, std::vector<Crew*>& );
     int resolve_damage( Effect& );
