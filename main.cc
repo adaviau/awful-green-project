@@ -33,7 +33,7 @@ int main( int argc, char *argv[] ) {
 
     GameMaster gm( turn_count );
     gm.init();
-    gm.run_design_grow();
+    gm.run_design_stun();
 
     return 0;
 

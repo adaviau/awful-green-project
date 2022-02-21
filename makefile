@@ -27,5 +27,12 @@ compile:
 		initializer.cc \
 		main.cc
 
+cleanall: clean
+	rm *.txt
+	rm AwfulGreen
+
 clean:
 	rm *.o
+
+
+

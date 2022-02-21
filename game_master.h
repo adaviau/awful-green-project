@@ -70,6 +70,7 @@ public:
     void run_design();
     void run_design_weapons();
     void run_design_grow();
+    void run_design_stun();
 
 };
 

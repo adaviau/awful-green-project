@@ -58,6 +58,21 @@ void GameMaster::weapon_placement() {
 
 }
 
+void GameMaster::run_design_stun() {
+
+    crew.debug();
+    crew_turn();
+
+    static_cast< Crew* >( &crew[0] )->stun();
+
+    crew.debug();
+    crew_turn();
+
+    crew.debug();
+    crew_turn();
+
+}
+
 void GameMaster::run_design_grow() {
 
     // for ( int i=0; i<10; ++i ) {
@@ -407,8 +422,18 @@ void GameMaster::crew_turn() {
     // WAKE PREVIOUSLY STUNNED CREW
 
     // RESET TURN FOR NEXT ROUND
-    for ( int i=0; i<crew.size(); ++i )
-        static_cast< Actor* >( &crew[i] )->reset_turn();
+    for ( int i=0; i<crew.size(); ++i ) {
+
+        Actor * cursor = static_cast< Actor* >( &crew[i] );
+
+        if ( cursor->canWake() )
+            cursor->wakeup();
+        else 
+            cursor->set_wakeable();
+    
+        cursor->reset_turn();
+
+    }
 
 }
 
@@ -420,24 +445,7 @@ void GameMaster::monster_turn() {
     std::vector< Monster* > list = ActionGenerator::shuffled_monster_list( monsters );
 
     // Grow
-    std::uniform_int_distribution<int> range( 0, 4 );
-    int grow_choice = range( mt_rand );
-    std::string grow_choice_str;
-    if ( grow_choice == 0 ) {
-        grow_choice_str = "FRAGMENT";
-    } else if ( grow_choice == 1 ) {
-        grow_choice_str = "EGG";
-    } else if ( grow_choice == 2 ) {
-        grow_choice_str = "BABY";
-    } else {
-        grow_choice_str = "ADULT";
-    }
-    
-    for ( int i=0; i<monsters.size(); ++i ) {
-        if ( static_cast< Monster* >( &monsters[i] )->getStage() == grow_choice_str )
-            static_cast< Monster* >( &monsters[i] )->grow();
-    }
-
+    grow_monsters();
 
     // std::cout << "--Movement Phase" << std::endl;
     // Move
@@ -517,12 +525,20 @@ void GameMaster::monster_turn() {
     }
 
 
-    // Wake Up
-
-
+    // Wake wakeable OR make wakeable AND reset turn 
     // RESET TURN FOR NEXT ROUND
-    for ( int i=0; i<monsters.size(); ++i )
-        static_cast< Actor* >( &monsters[i] )->reset_turn();
+    for ( int i=0; i<monsters.size(); ++i ) {
+
+        Actor * cursor = static_cast< Actor* >( &monsters[i] );
+
+        if ( cursor->canWake() )
+            cursor->wakeup();
+        else 
+            cursor->set_wakeable();
+    
+        cursor->reset_turn();
+
+    }
 
 }
 

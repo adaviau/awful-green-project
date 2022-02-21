@@ -262,6 +262,7 @@ std::vector< Monster* > ActionGenerator::shuffled_monster_list( Manifest& m ) {
 
     // std::cout << "REACHED\n";
     return output;
+    
 }
 // Location Shuffler
 std::vector< Location* > ActionGenerator::shuffled_location_list( Map& m ) {

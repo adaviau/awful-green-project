@@ -15,6 +15,7 @@ protected:
     bool stunned;
     bool alive;
     bool turn_used;
+    bool stunned_this_turn;
 
 public:
     Actor( ENTITY_TYPE );
@@ -25,10 +26,12 @@ public:
     bool isStunned();
     bool isAlive();
     bool canAttack();
+    bool canWake();
     bool canGrabWeapon();
 
     void stun();
     void wakeup();
+    void set_wakeable();
     void kill();
     void complete_turn();
     void reset_turn();
