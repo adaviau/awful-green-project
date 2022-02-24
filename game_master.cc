@@ -796,13 +796,13 @@ void GameMaster::apply_attack( Actor& target, std::vector<Crew*>& attack_team ) 
     // GROW
     if ( grow_dir || grow_loc || grow_exp ) {
 
-        target_monster->grow();
+        grow_monster( *target_monster );
 
     }
     // SHRINK
     if ( shrink_dir || shrink_loc || shrink_exp ) {
 
-        target_monster->shrink();
+        shrink_monster( *target_monster );
 
     }
     // KILL
@@ -813,17 +813,14 @@ void GameMaster::apply_attack( Actor& target, std::vector<Crew*>& attack_team ) 
     // FRAGMENT
     } else if ( fragment_dir || fragment_loc || fragment_exp ) {
 
-        for ( int frags=0; frags<fragment_dir + fragment_loc + fragment_exp; ++frags ) {
-            Monster * piece = new Monster( "Fragment" );
-            piece->enter( *target.getLocation() );
-            new_fragments.push_back( piece );
-        }
-        target_monster->fragment();
+        new_fragments = fragment_monster( *target_monster );
 
     // STUN
     } else if ( target_constitution <= stun_dir + stun_loc + stun_exp ) {
         
         target_monster->stun();
+        for ( int f=0; f<new_fragments.size(); ++f )
+            new_fragments[f]->stun();
 
     }
 
@@ -996,9 +993,10 @@ void GameMaster::shrink_monster( Monster& monster ) {
 
 }
 
-void GameMaster::fragment_monster( Monster& monster ) {
+std::vector< Monster* > GameMaster::fragment_monster( Monster& monster ) {
 
     int number_of_pieces = roll_dice(1);
+    std::vector< Monster* > output;
 
     std::cout << "VERBOSE- Attempting to fragment Monster(" << monster.getID() << ")"
                     << " into " << number_of_pieces << " pieces." << std::endl;
@@ -1009,15 +1007,18 @@ void GameMaster::fragment_monster( Monster& monster ) {
 
     for ( i=0; i<number_of_pieces && !monster_limit_reached( "FRAGMENT" ); ++i ) {
 
-        Entity * created_fragment = new Monster( "FRAGMENT" );      
+        Monster * created_fragment = new Monster( "FRAGMENT" );      
         created_fragment->enter( *monster.getLocation() );
         monsters.add( *created_fragment );
+        output.push_back( created_fragment );
 
     }
 
     std::cout << "into " << i << " pieces." << std::endl;
 
     monster.kill();
+
+    return output;
 
 }
 

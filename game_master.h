@@ -55,7 +55,7 @@ private:
     bool monster_can_shrink( Monster& );
 
     void shrink_monster( Monster& );
-    void fragment_monster( Monster& );
+    std::vector< Monster* > fragment_monster( Monster& );
 
     void apply_attack( Actor&, std::vector<Crew*>& );
     int resolve_damage( Effect& );
