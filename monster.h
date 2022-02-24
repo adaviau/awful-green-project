@@ -16,6 +16,8 @@ public:
 
     // void activate();
     void grow();
+    void shrink();
+    void fragment();
 // active : bool
 // stage : string
 // getStage : string

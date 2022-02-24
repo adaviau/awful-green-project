@@ -50,4 +50,27 @@ void Monster::grow() {
 
 }
 
+void Monster::shrink() { 
+
+    if ( stage == "ADULT" )
+        setType( "BABY" );
+
+    else if ( stage == "BABY" )
+        setType( "EGG" );
+
+    else if ( stage == "FRAGMENT" )
+        setType( "EGG" );
+
+    else if ( stage == "EGG" )
+        kill();
+
+}
+
+void Monster::fragment() { 
+
+    kill();
+
+}
+
+
 std::string Monster::getStage() {   return stage;   }

@@ -51,6 +51,12 @@ private:
     void grow_monster( Monster& );
     void grow_monsters( );
 
+    bool monster_can_shrink( std::string );
+    bool monster_can_shrink( Monster& );
+
+    void shrink_monster( Monster& );
+    void fragment_monster( Monster& );
+
     void apply_attack( Actor&, std::vector<Crew*>& );
     int resolve_damage( Effect& );
 
@@ -71,6 +77,8 @@ public:
     void run_design_weapons();
     void run_design_grow();
     void run_design_stun();
+    
+    void run_design_fragment();
 
 };
 

@@ -6,8 +6,8 @@ GameMaster::GameMaster() : GameMaster( 500 ) { }
 
 GameMaster::GameMaster( int turn_option ) : turn( 0 ), max_turns( turn_option ) {
 
-    max_fragment_monsters = 3;
-    max_egg_monsters = 15;
+    max_fragment_monsters = 15;
+    max_egg_monsters = 10;
     max_baby_monsters = 3;
     max_adult_monsters = 3;
 
@@ -55,6 +55,29 @@ void GameMaster::weapon_placement() {
     Weapon * fence = static_cast< Weapon* >( &weapons[3] );
     // std::cout << "is fence deployable " << fence->isDeployable() << std::endl;
     // fence->deploy( map[8] );
+
+}
+
+void GameMaster::run_design_fragment() {
+
+    Monster * m = static_cast< Monster* >( &monsters[0] );
+
+    monsters.debug();
+
+    fragment_monster( *m );
+    fragment_monster( *m );
+    fragment_monster( *m );
+    fragment_monster( *m );
+    fragment_monster( *m );
+    fragment_monster( *m );
+
+    monsters.debug();
+
+    for ( int i=0; i<monsters.size(); ++i )
+        if ( static_cast< Monster* >( &monsters[i] )->getStage() == "FRAGMENT" )
+            shrink_monster( *static_cast< Monster* >( &monsters[i] ) );
+
+    monsters.debug();
 
 }
 
@@ -701,8 +724,6 @@ void GameMaster::apply_attack( Actor& target, std::vector<Crew*>& attack_team ) 
 
         } else if ( effect->is_stun_type() ) {
 
-            std::cout << "VERBOSE- " << tested_weapon[i]->hasAreaEffect();
-
             if ( tested_weapon[i]->hasAreaEffect() ) {
                 stun_loc += roll_result;
                 if ( tested_weapon[i]->hasExpandingEffect() )
@@ -767,6 +788,45 @@ void GameMaster::apply_attack( Actor& target, std::vector<Crew*>& attack_team ) 
     std::cout << "int fragment_exp = " << fragment_exp << std::endl;
     std::cout << "_________________________________________________________" << std::endl;
 
+    int target_constitution = target.getConstitution();
+    Monster *  target_monster = static_cast< Monster* >( &target );
+
+    std::vector< Monster* > new_fragments;
+
+    // GROW
+    if ( grow_dir || grow_loc || grow_exp ) {
+
+        target_monster->grow();
+
+    }
+    // SHRINK
+    if ( shrink_dir || shrink_loc || shrink_exp ) {
+
+        target_monster->shrink();
+
+    }
+    // KILL
+    if ( target_constitution <= damage_dir + damage_loc + damage_exp ) {
+
+        target_monster->kill();
+
+    // FRAGMENT
+    } else if ( fragment_dir || fragment_loc || fragment_exp ) {
+
+        for ( int frags=0; frags<fragment_dir + fragment_loc + fragment_exp; ++frags ) {
+            Monster * piece = new Monster( "Fragment" );
+            piece->enter( *target.getLocation() );
+            new_fragments.push_back( piece );
+        }
+        target_monster->fragment();
+
+    // STUN
+    } else if ( target_constitution <= stun_dir + stun_loc + stun_exp ) {
+        
+        target_monster->stun();
+
+    }
+
     if ( untested_weapon.size() > 1 ) {
         untested_weapon[0]->remove_effect();
         std::cout << "EVENT- Weapon(" << untested_weapon[0] << ") effect "
@@ -828,6 +888,25 @@ bool GameMaster::monster_can_grow( std::string stage ) {
 bool GameMaster::monster_can_grow( Monster& monster ) {
 
     return monster_can_grow( monster.getStage() );
+
+}
+
+bool GameMaster::monster_can_shrink( std::string stage ) {
+
+    if ( stage == "ADULT" )
+        return !monster_limit_reached( "BABY" );
+    else if ( stage == "BABY" )
+        return !monster_limit_reached( "EGG" );
+    else if ( stage == "FRAGMENT" )
+        return !monster_limit_reached( "EGG" );
+
+    return false;
+
+}
+
+bool GameMaster::monster_can_shrink( Monster& monster ) {
+
+    return monster_can_shrink( monster.getStage() );
 
 }
 
@@ -896,6 +975,49 @@ void GameMaster::grow_monsters( ) {
     }
 
     std::cout << "VERBOSE- No growing could be performed" << std::endl;
+
+}
+
+
+void GameMaster::shrink_monster( Monster& monster ) {
+
+    std::cout << "VERBOSE- Attempting to shrink Monster(" << monster.getID() << ")"
+                    << std::endl;
+
+    bool can_shrink = monster_can_shrink( monster );
+
+    if ( !can_shrink ) {
+        std::cout << "VERBOSE- Monster limit reached. Monster(" << monster.getID() << ")"
+                    << " cannot shrink" << std::endl;
+        return;
+    }
+
+    monster.shrink();
+
+}
+
+void GameMaster::fragment_monster( Monster& monster ) {
+
+    int number_of_pieces = roll_dice(1);
+
+    std::cout << "VERBOSE- Attempting to fragment Monster(" << monster.getID() << ")"
+                    << " into " << number_of_pieces << " pieces." << std::endl;
+            
+    std::cout << "EVENT- Monster is blown apart ";
+    
+    int i;
+
+    for ( i=0; i<number_of_pieces && !monster_limit_reached( "FRAGMENT" ); ++i ) {
+
+        Entity * created_fragment = new Monster( "FRAGMENT" );      
+        created_fragment->enter( *monster.getLocation() );
+        monsters.add( *created_fragment );
+
+    }
+
+    std::cout << "into " << i << " pieces." << std::endl;
+
+    monster.kill();
 
 }
 
