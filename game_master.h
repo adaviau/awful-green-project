@@ -80,7 +80,7 @@ public:
     void run_design_weapons();
     void run_design_grow();
     void run_design_stun();
-    
+    void run_design_collateral();
     void run_design_fragment();
 
 };

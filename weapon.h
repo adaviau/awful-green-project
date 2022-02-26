@@ -35,7 +35,7 @@ public:
     void set_single_use();
     void set_respawning();
     void set_respawn_location( Location& );
-
+    void set_regular_effect( Effect& );
 
     void repawn();
 

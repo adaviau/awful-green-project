@@ -33,7 +33,7 @@ int main( int argc, char *argv[] ) {
 
     GameMaster gm( turn_count );
     gm.init();
-    gm.run();
+    gm.run_design_collateral();
 
     return 0;
 

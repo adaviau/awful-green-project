@@ -9,6 +9,7 @@ link: compile
 		manifest.o \
 		location.o map.o \
 		effect.o \
+		damage_profile.o \
 		action_generator.o \
 		attack_plan.o \
 		game_master.o \
@@ -21,6 +22,7 @@ compile:
 		manifest.cc \
 		location.cc map.cc \
 		effect.cc \
+		damage_profile.cc \
 		action_generator.cc \
 		attack_plan.cc \
 		game_master.cc \

@@ -60,6 +60,49 @@ void GameMaster::weapon_placement() {
 
 }
 
+void GameMaster::run_design_collateral() {
+
+    monsters[0].enter( map[6] );
+    monsters[1].enter( map[7] );
+    monsters[2].enter( map[8] );
+
+    crew[0].enter( map[6] );
+
+    monsters.debug();
+    crew.debug();
+
+    map.debug();
+
+    int expand_idx = 8;
+
+    Actor * base_target = static_cast< Crew* >( &crew[0] );
+
+    std::vector< Entity* > local = ActionGenerator::collateral_damage_local( *base_target, map );
+    std::vector< Entity* > expanded = ActionGenerator::collateral_damage_expanded( map[ expand_idx ], map );
+
+
+    std::cout << "There are " << local.size() << " Entities in Hall_1_1" << std::endl;
+
+    std::cout << map[ expand_idx ].getName() << " has " 
+                << ActionGenerator::get_expansion_locations( map[ expand_idx ], map ).size() 
+                << " rooms expansion will extend to" << std::endl; 
+
+    std::cout << "There are " << expanded.size() << " Entities in Expanded area from " << map[ expand_idx ].getName() << std::endl;
+
+
+    Weapon * gas_grenade = static_cast< Weapon* >( &weapons[1] );
+    Effect * regular_effect = gas_grenade->get_regular_effect();
+
+    if ( regular_effect )
+        std::cout << "Gas Grenade has a regular effect: " << regular_effect->getName()   << std::endl;
+    else
+        std::cout << "Gas Grenade has NO regular effect" << std::endl;
+
+
+
+
+}
+
 void GameMaster::run_design_fragment() {
 
     Monster * m = static_cast< Monster* >( &monsters[0] );
@@ -683,10 +726,14 @@ void GameMaster::apply_crew_attack( Actor& target, std::vector<Crew*>& attack_te
     int damage_dir = 0;
     int damage_loc = 0;
     int damage_exp = 0;
+    int damage_loc_crew = 0;
+    int damage_exp_crew = 0;
 
     int stun_dir = 0;
     int stun_loc = 0;
     int stun_exp = 0;
+    int stun_loc_crew = 0;
+    int stun_exp_crew = 0;
 
     int grow_dir = 0;
     int grow_loc = 0;
@@ -701,7 +748,7 @@ void GameMaster::apply_crew_attack( Actor& target, std::vector<Crew*>& attack_te
     int fragment_exp = 0;
 
     // CALCULATING THE HAND TO HAND ATTACKS
-    damage_dir += roll_dice( hand_to_hand_strikes );
+    // damage_dir += roll_dice( hand_to_hand_strikes );
     
     // CALCULATING UNKNOWN EFFECTS
     if ( untested_weapon.size() > 0 ) {
@@ -728,11 +775,11 @@ void GameMaster::apply_crew_attack( Actor& target, std::vector<Crew*>& attack_te
 
     // Generate the List for all affected entities
 
-
         // CALCULATING FULL DAMAGE PROFILE
         for (int i=0; i<tested_weapon.size(); ++i) {
 
             Effect * effect = tested_weapon[i]->get_monster_effect();
+            Effect * crew_effect = tested_weapon[i]->get_regular_effect();
             int roll_result = roll_dice( effect->get_dice_count() );
 
             if ( effect->is_kill_type() ) {
@@ -787,8 +834,32 @@ void GameMaster::apply_crew_attack( Actor& target, std::vector<Crew*>& attack_te
 
             }
 
+            if ( crew_effect && crew_effect->is_kill_type() ) {
+
+                if ( tested_weapon[i]->hasAreaEffect() ) {
+                    damage_loc_crew += roll_result;
+                    if ( tested_weapon[i]->hasExpandingEffect() )
+                        damage_exp_crew += roll_result;
+                } else {
+                    damage_dir += roll_result;
+                }
+
+            } else if ( crew_effect && crew_effect->is_stun_type() ) {
+
+                if ( tested_weapon[i]->hasAreaEffect() ) {
+                    stun_loc_crew += roll_result;
+                    if ( tested_weapon[i]->hasExpandingEffect() )
+                        damage_exp += roll_result;
+                } else {
+                    stun_exp_crew += roll_result;
+                }
+
+            }
+
         }
 
+        // VERBOSE DESCRIPTION
+        {
         std::cout << "ATTACK RESOLUTION________________________________________" << std::endl;
         std::cout << "int damage_dir = " << damage_dir << std::endl;
         std::cout << "int damage_loc = " << damage_loc << std::endl;
@@ -810,7 +881,10 @@ void GameMaster::apply_crew_attack( Actor& target, std::vector<Crew*>& attack_te
         std::cout << "int fragment_loc = " << fragment_loc << std::endl;
         std::cout << "int fragment_exp = " << fragment_exp << std::endl;
         std::cout << "_________________________________________________________" << std::endl;
+        }
 
+        // APPLY DAMAGE
+        {
         int target_constitution = target.getConstitution();
         Monster *  target_monster = static_cast< Monster* >( &target );
 
@@ -845,6 +919,7 @@ void GameMaster::apply_crew_attack( Actor& target, std::vector<Crew*>& attack_te
             for ( int f=0; f<new_fragments.size(); ++f )
                 new_fragments[f]->stun();
 
+        }
         }
 
     // Remove Effect for Multi-Unknown condition

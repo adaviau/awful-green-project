@@ -54,8 +54,8 @@ void Initializer::buildMap( Map& m ) {
     hall_1_2.add_connection( 1 );
     hall_1_2.add_connection( 5 );
     hall_1_2.add_connection( 8 );
-    hall_1_1.add_expansion( 6 );
-    hall_1_1.add_expansion( 8 );
+    hall_1_2.add_expansion( 6 );
+    hall_1_2.add_expansion( 8 );
     m.add( hall_1_2 );
 
     Location hall_1_3( "Hall_1_3", 8 );
@@ -64,8 +64,8 @@ void Initializer::buildMap( Map& m ) {
     hall_1_3.add_connection( 3 );
     hall_1_3.add_connection( 4 );
     hall_1_3.add_sightline( 6 );
-    hall_1_1.add_expansion( 6 );
-    hall_1_1.add_expansion( 7 );
+    hall_1_3.add_expansion( 6 );
+    hall_1_3.add_expansion( 7 );
     m.add( hall_1_3 );
 
 }
@@ -126,6 +126,7 @@ void Initializer::buildWeapons( Manifest& m ) {
     gas_grenade->set_ranged();
     gas_grenade->set_area_of_effect();
     gas_grenade->set_expanding();
+    gas_grenade->set_regular_effect( *( new Effect( _5_DICE_TO_STUN ) ) );
     Weapon * fire_extinguisher = new Weapon( "Fire Extinguisher" );
     fire_extinguisher->set_area_of_effect();
     fire_extinguisher->set_ranged();

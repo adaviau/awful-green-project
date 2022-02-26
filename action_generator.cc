@@ -99,7 +99,7 @@ std::vector< Location* >
 std::vector< Location* >
     ActionGenerator::get_expansion_locations( Location& l, Map& m ) {
 
-    std::vector< Location* > output = get_connected_locations( l, m );
+    std::vector< Location* > output;
 
     for ( int i=0; i<l.room_expansions.size(); ++i ) 
         output.push_back( &m[ l.room_expansions[i] ] );

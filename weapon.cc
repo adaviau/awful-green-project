@@ -102,6 +102,16 @@ void Weapon::deploy( Location& l ) {
 
 }
 
+void Weapon::set_regular_effect( Effect& e ) {
+
+    if ( regular_effect ) {
+        std::cout << "ERROR: Weapon already has assignment" << std::endl; 
+        return;
+    }
+    regular_effect = &e;
+
+}
+
 void Weapon::assign_effect( Effect& e ) {
     
     if ( monster_effect ) {
