@@ -27,6 +27,12 @@ void Location::add_sightline( int i ) {
     room_sightlines.shrink_to_fit();
 
 }
+void Location::add_expansion( int i ) {
+
+    room_expansions.push_back( i );
+    room_expansions.shrink_to_fit();
+
+}
 
 bool Location::contains( Entity& e ) {
 

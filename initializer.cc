@@ -45,6 +45,8 @@ void Initializer::buildMap( Map& m ) {
     hall_1_1.add_connection( 0 );
     hall_1_1.add_connection( 7 );
     hall_1_1.add_sightline( 8 );
+    hall_1_1.add_expansion( 7 );
+    hall_1_1.add_expansion( 8 );
     m.add( hall_1_1 );
 
     Location hall_1_2( "Hall_1_2", 7 );
@@ -52,6 +54,8 @@ void Initializer::buildMap( Map& m ) {
     hall_1_2.add_connection( 1 );
     hall_1_2.add_connection( 5 );
     hall_1_2.add_connection( 8 );
+    hall_1_1.add_expansion( 6 );
+    hall_1_1.add_expansion( 8 );
     m.add( hall_1_2 );
 
     Location hall_1_3( "Hall_1_3", 8 );
@@ -60,6 +64,8 @@ void Initializer::buildMap( Map& m ) {
     hall_1_3.add_connection( 3 );
     hall_1_3.add_connection( 4 );
     hall_1_3.add_sightline( 6 );
+    hall_1_1.add_expansion( 6 );
+    hall_1_1.add_expansion( 7 );
     m.add( hall_1_3 );
 
 }
@@ -77,7 +83,7 @@ void Initializer::buildCrew( Manifest& m ) {
     andrew->setStats( 2, 19, 2 );
     evan->setStats( 1, 15, 3 );
     denis->setStats( 1, 11, 4 );
-    robot->setStats( 4, 4, 1 );
+    robot->setStats( 4, 44, 1 );
     robot->set_robot();
     std::cout << "Set Vic can move " << victoria->getMovement() << " places\n";
 

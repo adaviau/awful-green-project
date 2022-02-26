@@ -19,6 +19,7 @@ public:
     std::vector< Entity* > occupents;
     std::vector<int> room_connections;
     std::vector<int> room_sightlines;
+    std::vector<int> room_expansions;
 
     Location();
     Location( std::string, int );
@@ -26,6 +27,7 @@ public:
 
     void add_connection( int );
     void add_sightline( int );
+    void add_expansion( int );
 
     void add_occupent( Entity& );
     void remove_occupent( Entity& );

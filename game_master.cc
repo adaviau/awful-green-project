@@ -250,7 +250,6 @@ void GameMaster::run_design() {
 void GameMaster::run() {
 
     crew_discovers_monsters();
-    crew_turn();
 
     while ( ++turn <= max_turns ) {
 
@@ -494,13 +493,25 @@ void GameMaster::monster_turn() {
     for (auto it = location_list.begin(); it != location_list.end(); ++it) {
 
         // GET TARGET LIST AT LOCATION
+        std::cout << "VERBOSE- generating target(s) list" << std::endl;
         std::vector< Crew* > targets = ActionGenerator::get_crew_targets( **it, map );
 
+        if ( targets.size() < 1 ) {
+            std::cout << "STATE-- " << "There are " << targets.size() << " target(s) in the " 
+                        << (*it)->getName() << std::endl;
+            continue;
+        }
+
         // GET ALL MONSTERS THAT CAN ATTACK HERE
+        std::cout << "VERBOSE- generating attacker(s) list" << std::endl;
         std::vector< Monster* > attackers = ActionGenerator::monsters_that_can_attack( **it, monsters );
 
-        std::cout << "DEBUG-- " << "There are " << targets.size() << " target(s) and " << 
+        std::cout << "STATE-- " << "There are " << targets.size() << " target(s) and " << 
             attackers.size() << " attacker(s)" << " in the " << (*it)->getName() << std::endl;  
+        
+        if ( attackers.size() < 1 ) {
+            continue;
+        }
         
         // DEAL WITH TARGETS ONE AT A TIME
         for (int i=0; i<targets.size() && attackers.size()>0; ++i) {
@@ -526,29 +537,12 @@ void GameMaster::monster_turn() {
             std::cout << "DEBUG-- " << "Team attacking " << targets[i]->getName() << 
                 " is of size " << attack_team.size() << std::endl;
             
-            // CALCULATE DAMAGES FROM ATTACK TEAM
-            int directed_damage = 0;
-
-            for (int i=0; i<team_size; ++i) {
-
-                directed_damage += attack_team[i]->getStrength();
-
-                attack_team[i]->complete_turn();
-
-            }
-
-            std::cout << "DEBUG-- Attack Team deals " << directed_damage << " directed damage." << std::endl; 
-
-            // PERFORM THE ATTACK
-            if ( directed_damage >= targets[i]->getConstitution() ) 
-                targets[i]->kill();
+            // APPLY ATTACK
+            apply_monster_attack( *targets[i], attack_team );
 
         }
-            // RANDOMIZE TEAM SIZE
-            // MAKE TEAM FROM LAST 
 
     }
-
 
     // Wake wakeable OR make wakeable AND reset turn 
     // RESET TURN FOR NEXT ROUND
@@ -572,6 +566,14 @@ void GameMaster::crew_discovers_monsters() {
     std::cout << "Turn " << turn << " - Awful Green Things Discovered" << std::endl;
     // Move (1 or 2 crew up to allowed movement to discover monsters)
     // Attack (Hand to Hand only)
+
+    // Random number between 1 and 2
+
+    // Find crew who can move to attack a monster
+
+    // Move them to the area where the monster is
+
+    // Apply the attack
 
 }
 
@@ -718,125 +720,132 @@ void GameMaster::apply_crew_attack( Actor& target, std::vector<Crew*>& attack_te
 
     }
 
-    // CALCULATING ALL KNOWN EFFECT ATTACKS
-    for (int i=0; i<tested_weapon.size(); ++i) {
+    std::vector< Monster* > new_fragments;
 
-        Effect * effect = tested_weapon[i]->get_monster_effect();          
-        int roll_result = roll_dice( effect->get_dice_count() );
+    Location * attack_location = target.getLocation();
+    std::vector< Entity* > area_of_effect_actors = ActionGenerator::collateral_damage_local( target, map );
+    std::vector< Entity* > expansion_zone_entities = ActionGenerator::collateral_damage_expanded( *attack_location, map );
 
-        if ( effect->is_kill_type() ) {
+    // Generate the List for all affected entities
 
-            if ( tested_weapon[i]->hasAreaEffect() ) {
-                damage_loc += roll_result;
-                if ( tested_weapon[i]->hasExpandingEffect() )
-                    damage_exp += roll_result;
-            } else {
-                damage_dir += roll_result;
-            }
 
-        } else if ( effect->is_stun_type() ) {
+        // CALCULATING FULL DAMAGE PROFILE
+        for (int i=0; i<tested_weapon.size(); ++i) {
 
-            if ( tested_weapon[i]->hasAreaEffect() ) {
-                stun_loc += roll_result;
-                if ( tested_weapon[i]->hasExpandingEffect() )
-                    stun_exp += roll_result;
-            } else {
-                stun_dir += roll_result;
-            }
+            Effect * effect = tested_weapon[i]->get_monster_effect();
+            int roll_result = roll_dice( effect->get_dice_count() );
 
-        } else if ( effect->is_grow_type() ) {
+            if ( effect->is_kill_type() ) {
 
-            if ( tested_weapon[i]->hasAreaEffect() ) {
-                grow_loc += 1;
-                if ( tested_weapon[i]->hasExpandingEffect() )
-                    grow_exp += 1;
-            } else {
-                grow_dir += 1;
-            }
-        
-        } else if ( effect->is_shrink_type() ) {
+                if ( tested_weapon[i]->hasAreaEffect() ) {
+                    damage_loc += roll_result;
+                    if ( tested_weapon[i]->hasExpandingEffect() )
+                        damage_exp += roll_result;
+                } else {
+                    damage_dir += roll_result;
+                }
 
-            if ( tested_weapon[i]->hasAreaEffect() ) {
-                shrink_loc += 1;
-                if ( tested_weapon[i]->hasExpandingEffect() )
-                    shrink_exp += 1;
-            } else {
-                shrink_dir += 1;
-            }
-        
-        } else if ( effect->is_frag_type() ) {
+            } else if ( effect->is_stun_type() ) {
 
-            if ( tested_weapon[i]->hasAreaEffect() ) {
-                fragment_loc += roll_result;
-                if ( tested_weapon[i]->hasExpandingEffect() )
-                    fragment_exp += roll_result;
-            } else {
-                fragment_dir += roll_result;
+                if ( tested_weapon[i]->hasAreaEffect() ) {
+                    stun_loc += roll_result;
+                    if ( tested_weapon[i]->hasExpandingEffect() )
+                        stun_exp += roll_result;
+                } else {
+                    stun_dir += roll_result;
+                }
+
+            } else if ( effect->is_grow_type() ) {
+
+                if ( tested_weapon[i]->hasAreaEffect() ) {
+                    grow_loc += 1;
+                    if ( tested_weapon[i]->hasExpandingEffect() )
+                        grow_exp += 1;
+                } else {
+                    grow_dir += 1;
+                }
+            
+            } else if ( effect->is_shrink_type() ) {
+
+                if ( tested_weapon[i]->hasAreaEffect() ) {
+                    shrink_loc += 1;
+                    if ( tested_weapon[i]->hasExpandingEffect() )
+                        shrink_exp += 1;
+                } else {
+                    shrink_dir += 1;
+                }
+            
+            } else if ( effect->is_frag_type() ) {
+
+                if ( tested_weapon[i]->hasAreaEffect() ) {
+                    fragment_loc += roll_result;
+                    if ( tested_weapon[i]->hasExpandingEffect() )
+                        fragment_exp += roll_result;
+                } else {
+                    fragment_dir += roll_result;
+                }
+
             }
 
         }
 
-    }
+        std::cout << "ATTACK RESOLUTION________________________________________" << std::endl;
+        std::cout << "int damage_dir = " << damage_dir << std::endl;
+        std::cout << "int damage_loc = " << damage_loc << std::endl;
+        std::cout << "int damage_exp = " << damage_exp << std::endl;
 
-    std::cout << "ATTACK RESOLUTION________________________________________" << std::endl;
-    std::cout << "int damage_dir = " << damage_dir << std::endl;
-    std::cout << "int damage_loc = " << damage_loc << std::endl;
-    std::cout << "int damage_exp = " << damage_exp << std::endl;
+        std::cout << "int stun_dir = " << stun_dir << std::endl;
+        std::cout << "int stun_loc = " << stun_loc << std::endl;
+        std::cout << "int stun_exp = " << stun_exp << std::endl;
 
-    std::cout << "int stun_dir = " << stun_dir << std::endl;
-    std::cout << "int stun_loc = " << stun_loc << std::endl;
-    std::cout << "int stun_exp = " << stun_exp << std::endl;
+        std::cout << "int grow_dir = " << grow_dir << std::endl;
+        std::cout << "int grow_loc = " << grow_loc << std::endl;
+        std::cout << "int grow_exp = " << grow_exp << std::endl;
 
-    std::cout << "int grow_dir = " << grow_dir << std::endl;
-    std::cout << "int grow_loc = " << grow_loc << std::endl;
-    std::cout << "int grow_exp = " << grow_exp << std::endl;
+        std::cout << "int shrink_dir = " << shrink_dir << std::endl;
+        std::cout << "int shrink_loc = " << shrink_loc << std::endl;
+        std::cout << "int shrink_exp = " << shrink_exp << std::endl;
 
-    std::cout << "int shrink_dir = " << shrink_dir << std::endl;
-    std::cout << "int shrink_loc = " << shrink_loc << std::endl;
-    std::cout << "int shrink_exp = " << shrink_exp << std::endl;
+        std::cout << "int fragment_dir = " << fragment_dir << std::endl;
+        std::cout << "int fragment_loc = " << fragment_loc << std::endl;
+        std::cout << "int fragment_exp = " << fragment_exp << std::endl;
+        std::cout << "_________________________________________________________" << std::endl;
 
-    std::cout << "int fragment_dir = " << fragment_dir << std::endl;
-    std::cout << "int fragment_loc = " << fragment_loc << std::endl;
-    std::cout << "int fragment_exp = " << fragment_exp << std::endl;
-    std::cout << "_________________________________________________________" << std::endl;
+        int target_constitution = target.getConstitution();
+        Monster *  target_monster = static_cast< Monster* >( &target );
 
-    int target_constitution = target.getConstitution();
-    Monster *  target_monster = static_cast< Monster* >( &target );
+        // GROW
+        if ( grow_dir || grow_loc || grow_exp ) {
 
-    std::vector< Monster* > new_fragments;
+            grow_monster( *target_monster );
 
-    // GROW
-    if ( grow_dir || grow_loc || grow_exp ) {
+        }
+        // SHRINK
+        if ( shrink_dir || shrink_loc || shrink_exp ) {
 
-        grow_monster( *target_monster );
+            shrink_monster( *target_monster );
 
-    }
-    // SHRINK
-    if ( shrink_dir || shrink_loc || shrink_exp ) {
+        }
+        // KILL
+        if ( target_constitution <= damage_dir + damage_loc + damage_exp ) {
 
-        shrink_monster( *target_monster );
+            target_monster->kill();
+            std::cout << "STATE- Monster(" << target_monster->getName() << ", " << target_monster->getID() 
+                        << ") has been killed." << std::endl;
 
-    }
-    // KILL
-    if ( target_constitution <= damage_dir + damage_loc + damage_exp ) {
+        // FRAGMENT
+        } else if ( fragment_dir || fragment_loc || fragment_exp ) {
 
-        target_monster->kill();
-        std::cout << "STATE- Monster(" << target_monster->getName() << ", " << target_monster->getID() 
-                    << ") has been killed." << std::endl;
+            new_fragments = fragment_monster( *target_monster );
 
-    // FRAGMENT
-    } else if ( fragment_dir || fragment_loc || fragment_exp ) {
+        // STUN
+        } else if ( target_constitution <= stun_dir + stun_loc + stun_exp ) {
+            
+            target_monster->stun();
+            for ( int f=0; f<new_fragments.size(); ++f )
+                new_fragments[f]->stun();
 
-        new_fragments = fragment_monster( *target_monster );
-
-    // STUN
-    } else if ( target_constitution <= stun_dir + stun_loc + stun_exp ) {
-        
-        target_monster->stun();
-        for ( int f=0; f<new_fragments.size(); ++f )
-            new_fragments[f]->stun();
-
-    }
+        }
 
     // Remove Effect for Multi-Unknown condition
     if ( untested_weapon.size() > 1 ) {

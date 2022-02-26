@@ -95,6 +95,19 @@ std::vector< Location* >
 
 }
 
+// Return all the exansion locations for expanding weapons.
+std::vector< Location* >
+    ActionGenerator::get_expansion_locations( Location& l, Map& m ) {
+
+    std::vector< Location* > output = get_connected_locations( l, m );
+
+    for ( int i=0; i<l.room_expansions.size(); ++i ) 
+        output.push_back( &m[ l.room_expansions[i] ] );
+
+    return output;
+
+}
+
 // Check if a location has a halting entity
 bool ActionGenerator::has_halting_entities( ENTITY_TYPE t, Location& l, Map& m ) {
 
@@ -218,6 +231,60 @@ std::vector< Monster* > ActionGenerator::get_monster_targets_ranged( Location& l
     return output;
 
 }
+
+
+
+std::vector< Entity* > ActionGenerator::collateral_damage_local( Actor& a, Map& m ) {
+
+    std::vector< Entity* > output = collateral_damage_local( *a.getLocation(), m );
+
+    for ( int i=0; i<output.size(); ++i ) {
+
+        if ( a.getID() == output[i]->getID() ) {
+
+            // Swap and drop
+            output[i] = output[ output.size()-1 ];
+            output.pop_back();
+            break;
+
+        }
+
+    }
+
+    return output;
+    
+}
+
+std::vector< Entity* > ActionGenerator::collateral_damage_local( Location& l, Map& m ) {
+
+    std::vector< Entity* > output;
+
+    std::vector< Entity* > crew = get_entities( CREW, l, m );
+    std::vector< Entity* > monsters = get_entities( MONSTER, l, m );
+
+    output.insert( output.end(), crew.begin(), crew.end() );
+    output.insert( output.end(), monsters.begin(), monsters.end() );
+
+    return output;
+
+}
+std::vector< Entity* > ActionGenerator::collateral_damage_expanded( Location& l, Map& m ) {
+
+    std::vector< Entity* > output;
+
+    std::vector< Location* > locations = get_expansion_locations( l, m );
+
+    for ( int i=0; i<locations.size(); ++i ) {
+
+        std::vector< Entity* > temp = collateral_damage_local( *locations[i], m );
+        output.insert( output.end(), temp.begin(), temp.end() );
+
+    }
+
+    return output;
+
+}
+
 
 // Get Weapons at a location
 std::vector< Weapon* > ActionGenerator::get_weapons( Location& l, Map& m ) {

@@ -33,6 +33,8 @@ private:
     int max_baby_monsters;
     int max_adult_monsters;
 
+    bool friendly_fire;
+
     std::mt19937 mt_rand;
 
     void crew_placement();

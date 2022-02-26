@@ -16,6 +16,7 @@ namespace ActionGenerator {
     // Movement Related Functions
     std::vector< Location* > get_movement( Actor*, Map& );
     std::vector< Location* > get_connected_locations( Location&, Map& );
+    std::vector< Location* > get_expansion_locations( Location&, Map& );
     std::vector< Location* > get_line_of_sight_locations( Location&, Map& );
 
     // HELPERS    
@@ -28,6 +29,11 @@ namespace ActionGenerator {
     std::vector< Crew* > get_armed_crew_except_self( Crew*, Location&, Map& );
     std::vector< Monster* > get_monster_targets_near( Location&, Map& );
     std::vector< Monster* > get_monster_targets_ranged( Location&, Map& );
+
+    std::vector< Entity* > collateral_damage_local( Actor&, Map& );
+    std::vector< Entity* > collateral_damage_local( Location&, Map& );
+    std::vector< Entity* > collateral_damage_expanded( Location&, Map& );
+
     // std::vector< Weapon* > get_grabbable_weapons( Crew&, Location&, Map& );
     std::vector< Weapon* > get_weapons( Location&, Map& );
 
