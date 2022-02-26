@@ -15,7 +15,9 @@ Crew::Crew( std::string n, Location& l ) : Actor( n, CREW, l ) {
 
 }
 
-void Crew::setMascot( bool b ) { mascot = b; }
+void Crew::set_mascot() { mascot = true; }
+
+void Crew::set_robot() { robot = true; }
 
 void Crew::grab( Weapon& w ) {  
     
@@ -31,6 +33,10 @@ bool Crew::canGrabWeapon() {
     return !mascot && !stunned;
 
 }
+
+bool Crew::isMascot() { return mascot;  }
+
+bool Crew::isRobot() {  return robot;   }
 
 bool Crew::hasWeapon() {
 

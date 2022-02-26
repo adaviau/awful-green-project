@@ -70,11 +70,15 @@ void Initializer::buildCrew( Manifest& m ) {
     Crew * denis = new Crew( "Denis" );
     Crew * evan = new Crew( "Evan" );
     Crew * victoria = new Crew( "Victoria" );
+    Crew * robot = new Crew( "Leadfoot" );
+
     std::cout << "Default Vic can move " << victoria->getMovement() << " places\n";
     victoria->setStats( 3, 27, 1 );
     andrew->setStats( 2, 19, 2 );
     evan->setStats( 1, 15, 3 );
     denis->setStats( 1, 11, 4 );
+    robot->setStats( 4, 4, 1 );
+    robot->set_robot();
     std::cout << "Set Vic can move " << victoria->getMovement() << " places\n";
 
     // andrew->stun();
@@ -86,6 +90,7 @@ void Initializer::buildCrew( Manifest& m ) {
     m.add( *denis );
     m.add( *evan );
     m.add( *victoria );
+    m.add( *robot );
 
 }
 
@@ -107,20 +112,26 @@ void Initializer::buildMonsters( Manifest& m ) {
 
 void Initializer::buildWeapons( Manifest& m ) {
 
-    Weapon * laser = new Weapon( "Laser" );
-    Weapon * rifle = new Weapon( "Rifle" );
-    Weapon * pistol = new Weapon( "Pistol" );
-    Weapon * electric_fence = new Weapon( "Electic Fence" );
+    Weapon * bottle_of_acid = new Weapon( "Bottle of Acid" );
+    bottle_of_acid->set_single_use();
+    bottle_of_acid->set_respawning();
+    bottle_of_acid->set_ranged();
+    Weapon * gas_grenade = new Weapon( "Gas Grenade" );
+    gas_grenade->set_ranged();
+    gas_grenade->set_area_of_effect();
+    gas_grenade->set_expanding();
+    Weapon * fire_extinguisher = new Weapon( "Fire Extinguisher" );
+    fire_extinguisher->set_area_of_effect();
+    fire_extinguisher->set_ranged();
+    Weapon * stun_pistol = new Weapon( "Stun Pistol" );
+    stun_pistol->set_ranged();
+    Weapon * knife = new Weapon( "Knife" );
     Weapon * pool_queue = new Weapon( "Pool Queue" );
 
-    electric_fence->set_deployable();    
-    laser->set_area_of_effect();
-    laser->set_ranged();
-
-    m.add( *laser );
-    m.add( *rifle );
-    m.add( *pistol );
-    m.add( *electric_fence );
+    m.add( *bottle_of_acid );
+    m.add( *gas_grenade );
+    m.add( *stun_pistol );
+    m.add( *knife );
     m.add( *pool_queue );
 
 }

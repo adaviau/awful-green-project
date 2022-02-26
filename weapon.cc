@@ -48,6 +48,37 @@ void Weapon::set_expanding() {
 
 }
 
+void Weapon::set_single_use() { 
+
+    std::cout << "DEBUG - has single-use properties:" << expands << std::endl;
+    single_use = true; 
+    std::cout << "DEBUG - set_single_use: " << expands << std::endl;
+
+}
+
+void Weapon::set_respawning() { 
+
+    std::cout << "DEBUG - has respawns:" << respawning << std::endl;
+    respawning = true; 
+    std::cout << "DEBUG - set_respawning: " << respawning << std::endl;
+
+}
+
+void Weapon::set_respawn_location( Location& l ) { 
+
+    respawn_location = &l;
+
+}
+
+
+void Weapon::repawn() {
+
+    std::cout << "STATE- Weapon(" << getName() << ", " << getID() << " respawned at ";
+    enter( *respawn_location );
+    std::cout << location->getName() << std::endl;
+
+}
+
 void Weapon::grab() {
 
     exit();
@@ -105,6 +136,10 @@ bool Weapon::isRanged() {   return ranged;  }
 bool Weapon::isDeployable() {     return deployable;   }
 
 bool Weapon::isDeployed() {     return deployed;   }
+
+bool Weapon::isSingleUse() {   return single_use;  }
+
+bool Weapon::isRespawning() {   return respawning;  }
 
 bool Weapon::hasAreaEffect() {  return has_area_of_effect;  }
 

@@ -35,6 +35,7 @@ void GameMaster::crew_placement() {
     crew[1].enter( map[2] );
     crew[2].enter( map[4] );
     crew[3].enter( map[1] );
+    crew[4].enter( map[1] );
 
 }
 void GameMaster::monster_placement() {
@@ -52,7 +53,8 @@ void GameMaster::weapon_placement() {
     weapons[2].enter( map[4] );
     weapons[3].enter( map[0] );
     weapons[4].enter( map[0] );
-    Weapon * fence = static_cast< Weapon* >( &weapons[3] );
+    Weapon * bottle_of_acid = static_cast< Weapon* >( &weapons[0] );
+    bottle_of_acid->set_respawn_location( map[0] );
     // std::cout << "is fence deployable " << fence->isDeployable() << std::endl;
     // fence->deploy( map[8] );
 
@@ -433,7 +435,7 @@ void GameMaster::crew_turn() {
                 " is of size " << attack_team.size() << std::endl;
             
             // APPLY ATTACKS
-            apply_attack( *targets[i], attack_team );
+            apply_crew_attack( *targets[i], attack_team );
 
         }
 
@@ -598,7 +600,7 @@ bool GameMaster::check_win_conditions() {
 
 }
 
-void GameMaster::apply_attack( Actor& target, std::vector<Crew*>& attack_team ) {
+void GameMaster::apply_crew_attack( Actor& target, std::vector<Crew*>& attack_team ) {
 
     std::cout << "--Resolving Attack--" << std::endl;
 
@@ -647,6 +649,12 @@ void GameMaster::apply_attack( Actor& target, std::vector<Crew*>& attack_team ) 
                 }
 
                 std::cout << "effects "; 
+
+                if ( weapon->isSingleUse() )
+                    attack_team[i]->drop();
+
+                if ( weapon->isRespawning() )
+                    weapon->repawn();
 
             } else {
                 // Has weapon BUT USE Hand-to-Hand
@@ -701,8 +709,12 @@ void GameMaster::apply_attack( Actor& target, std::vector<Crew*>& attack_team ) 
         std::cout << "EVENT- Weapon(" << untested_weapon[0]->getName() << ") is assigned the "
                     << temp_effect->getName() << " effect." << std::endl;
 
-        for (int i=0; i<untested_weapon.size(); ++i)
+        for (int i=0; i<untested_weapon.size(); ++i) {
+
             tested_weapon.push_back( untested_weapon[0] );
+
+
+        }
 
     }
 
@@ -809,6 +821,8 @@ void GameMaster::apply_attack( Actor& target, std::vector<Crew*>& attack_team ) 
     if ( target_constitution <= damage_dir + damage_loc + damage_exp ) {
 
         target_monster->kill();
+        std::cout << "STATE- Monster(" << target_monster->getName() << ", " << target_monster->getID() 
+                    << ") has been killed." << std::endl;
 
     // FRAGMENT
     } else if ( fragment_dir || fragment_loc || fragment_exp ) {
@@ -824,6 +838,7 @@ void GameMaster::apply_attack( Actor& target, std::vector<Crew*>& attack_team ) 
 
     }
 
+    // Remove Effect for Multi-Unknown condition
     if ( untested_weapon.size() > 1 ) {
         untested_weapon[0]->remove_effect();
         std::cout << "EVENT- Weapon(" << untested_weapon[0] << ") effect "
@@ -834,6 +849,109 @@ void GameMaster::apply_attack( Actor& target, std::vector<Crew*>& attack_team ) 
     std::cout << "Complete Attack" << std::endl;
 
 }
+
+
+void GameMaster::apply_monster_attack( Actor& target, std::vector<Monster*>& attack_team ) {
+
+    std::cout << "--Resolving Monster Attack--" << std::endl;
+
+    std::cout << "EVENT- Target is: " << target.getID() << " attack team is size: "
+        << attack_team.size() << std::endl;  
+
+    int hand_to_hand_strikes = 0;
+    
+    // MAKING ATTACK DECISIONS
+    for (int i=0; i<attack_team.size(); ++i) {
+        
+        // USE physical attack
+        hand_to_hand_strikes += attack_team[i]->getStrength();
+
+        attack_team[i]->complete_turn();
+        std::cout  << "VERBOSE- " << attack_team[i]->getName() 
+                    << " is now unavailable until next turn" << std::endl;
+
+    }
+    
+    int damage_dir = 0;
+
+    // CALCULATING THE HAND TO HAND ATTACKS
+    damage_dir += roll_dice( hand_to_hand_strikes );
+
+    std::cout << "ATTACK RESOLUTION________________________________________" << std::endl;
+    std::cout << "int damage_dir = " << damage_dir << std::endl;
+    std::cout << "_________________________________________________________" << std::endl;
+
+    int target_constitution = target.getConstitution();
+    Crew *  target_crew = static_cast< Crew* >( &target );
+
+    // KILL Condition
+    if ( target_constitution <= damage_dir ) {
+
+        target_crew->kill();
+        std::cout << "STATE- Crew(" << target_crew->getName() << ", " << target_crew->getID() 
+                    << ") has been killed." << std::endl;
+        
+
+        std::uniform_int_distribution<int> range( 0, attack_team.size()-1 );
+        int idx_affected_monster = range( mt_rand );
+
+        Effect * effect = ActionGenerator::get_available_effect( effects ); 
+        int roll_result = roll_dice( effect->get_dice_count() );
+
+        Monster * affected_monster = attack_team[ idx_affected_monster ];
+
+        if ( target_crew->isRobot() && effect ) {
+       
+            std::cout << "STATE- Monster(" << affected_monster->getName() << ", " << affected_monster->getID() 
+                                << ") eats the Robot." << std::endl;
+
+            std::cout << "VERBOSE- Effect(" << effect->getName() << ")" << std::endl;
+
+            if ( effect->is_kill_type() ) {
+
+                if ( roll_result <= affected_monster->getConstitution() ) {
+                    affected_monster->kill();
+                    std::cout << "STATE- Monster(" << affected_monster->getName() << ", " << affected_monster->getID() 
+                                << ") has been killed." << std::endl;
+                }
+
+            } else if ( effect->is_stun_type() ) {
+
+                if ( roll_result <= affected_monster->getConstitution() ) {
+                    affected_monster->stun();
+                    std::cout << "STATE- Monster(" << affected_monster->getName() << ", " << affected_monster->getID() 
+                                << ") has been stunned." << std::endl;
+                }
+        
+            } else if ( effect->is_grow_type() ) {
+
+                grow_monster( *affected_monster );
+            
+            } else if ( effect->is_shrink_type() ) {
+
+                shrink_monster( *affected_monster );
+            
+            } else if ( effect->is_frag_type() ) {
+
+                fragment_monster( *affected_monster );
+
+            }
+        
+        } else { 
+            
+            std::cout << "STATE- Monster(" << affected_monster->getName() << ", " << affected_monster->getID() 
+                                << ") eats the crewman and grows." << std::endl;
+            grow_monster( *affected_monster );
+
+        }
+
+    }
+
+    std::cout << "Complete Attack" << std::endl;
+
+}
+
+
 
 // Return true if limit is reached
 bool GameMaster::monster_limit_reached( std::string stage ) {
@@ -1001,7 +1119,7 @@ std::vector< Monster* > GameMaster::fragment_monster( Monster& monster ) {
     std::cout << "VERBOSE- Attempting to fragment Monster(" << monster.getID() << ")"
                     << " into " << number_of_pieces << " pieces." << std::endl;
             
-    std::cout << "EVENT- Monster is blown apart ";
+    std::cout << "EVENT- Monster(" << monster.getName() << ", " << monster.getID() << ") is blown apart ";
     
     int i;
 

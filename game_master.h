@@ -57,7 +57,8 @@ private:
     void shrink_monster( Monster& );
     std::vector< Monster* > fragment_monster( Monster& );
 
-    void apply_attack( Actor&, std::vector<Crew*>& );
+    void apply_crew_attack( Actor&, std::vector< Crew* >& );    
+    void apply_monster_attack( Actor&, std::vector< Monster* >& );
     int resolve_damage( Effect& );
 
 public:
