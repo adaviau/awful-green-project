@@ -782,12 +782,19 @@ void GameMaster::apply_crew_attack( Actor& target, std::vector<Crew*>& attack_te
 
     DamageProfile damage;
     damage.weapons_used = tested_weapon;
+    damage.hand_to_hand_strikes = hand_to_hand_strikes;
 
     hit( target, DIRECTED, damage );
+
+    if ( damage.has_area_effect() && area_of_effect_actors.size() )
+        std::cout << "DEBUG- Area of effect damage is added." << std::endl;
 
     if ( damage.has_area_effect() )
         for ( auto it = area_of_effect_actors.begin(); it != area_of_effect_actors.end(); ++it ) 
             hit( **it, AREA_OF_EFFECT, damage );
+
+    if ( damage.has_expanded_effect() && expansion_zone_entities.size() )
+        std::cout << "DEBUG- Expanded effect damage is added." << std::endl;
 
     if ( damage.has_expanded_effect() )
         for ( auto it = expansion_zone_entities.begin(); it != expansion_zone_entities.end(); ++it ) 
@@ -1079,7 +1086,7 @@ Entity * GameMaster::hit( Entity& e, DAMAGE_TYPE type, DamageProfile& p ) {
 
         } else {
 
-            std::cout << "STATE- Monster(" << target->getName() << ", " << target->getID() 
+            std::cout << "STATE- Crew(" << target->getName() << ", " << target->getID() 
                         << ") survived attack unscathed." << std::endl;
 
         }
@@ -1121,17 +1128,20 @@ void GameMaster::apply_monster_attack( Actor& target, std::vector<Monster*>& att
     std::cout << "int damage_dir = " << damage_dir << std::endl;
     std::cout << "_________________________________________________________" << std::endl;
 
-    int target_constitution = target.getConstitution();
+    Location * attack_location = target.getLocation();
+    std::vector< Entity* > area_of_effect_actors = ActionGenerator::collateral_damage_local( target, map );
+    std::vector< Entity* > expansion_zone_entities = ActionGenerator::collateral_damage_expanded( *attack_location, map );
+
+    DamageProfile damage;
+    damage.hand_to_hand_strikes = hand_to_hand_strikes;
+
+    hit( target, DIRECTED, damage );
+
     Crew *  target_crew = static_cast< Crew* >( &target );
 
-    // KILL Condition
-    if ( target_constitution <= damage_dir ) {
-
-        target_crew->kill();
-        std::cout << "STATE- Crew(" << target_crew->getName() << ", " << target_crew->getID() 
-                    << ") has been killed." << std::endl;
+    // IF KILLED
+    if ( !target_crew->isAlive() ) {
         
-
         std::uniform_int_distribution<int> range( 0, attack_team.size()-1 );
         int idx_affected_monster = range( mt_rand );
 
