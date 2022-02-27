@@ -456,6 +456,13 @@ void GameMaster::crew_turn() {
         // DEAL WITH TARGETS ONE AT A TIME
         for (int i=0; i<targets.size() && attackers.size()>0; ++i) {
 
+            if ( !targets[i]->isAlive() ) {
+
+                std::cout << "DEBUG-- Targetted entity is already dead... Skipping to next target" << std::endl;
+                continue;
+
+            }
+
             // GENERATE ATTACK TEAMS
             std::uniform_int_distribution<int> range( 0, attackers.size() );
             int team_size = range( mt_rand );
@@ -723,29 +730,29 @@ void GameMaster::apply_crew_attack( Actor& target, std::vector<Crew*>& attack_te
 
     }
     
-    int damage_dir = 0;
-    int damage_loc = 0;
-    int damage_exp = 0;
-    int damage_loc_crew = 0;
-    int damage_exp_crew = 0;
+    // int damage_dir = 0;
+    // int damage_loc = 0;
+    // int damage_exp = 0;
+    // int damage_loc_crew = 0;
+    // int damage_exp_crew = 0;
 
-    int stun_dir = 0;
-    int stun_loc = 0;
-    int stun_exp = 0;
-    int stun_loc_crew = 0;
-    int stun_exp_crew = 0;
+    // int stun_dir = 0;
+    // int stun_loc = 0;
+    // int stun_exp = 0;
+    // int stun_loc_crew = 0;
+    // int stun_exp_crew = 0;
 
-    int grow_dir = 0;
-    int grow_loc = 0;
-    int grow_exp = 0;
+    // int grow_dir = 0;
+    // int grow_loc = 0;
+    // int grow_exp = 0;
 
-    int shrink_dir = 0;
-    int shrink_loc = 0;
-    int shrink_exp = 0;
+    // int shrink_dir = 0;
+    // int shrink_loc = 0;
+    // int shrink_exp = 0;
     
-    int fragment_dir = 0;
-    int fragment_loc = 0;
-    int fragment_exp = 0;
+    // int fragment_dir = 0;
+    // int fragment_loc = 0;
+    // int fragment_exp = 0;
 
     // CALCULATING THE HAND TO HAND ATTACKS
     // damage_dir += roll_dice( hand_to_hand_strikes );
@@ -773,154 +780,169 @@ void GameMaster::apply_crew_attack( Actor& target, std::vector<Crew*>& attack_te
     std::vector< Entity* > area_of_effect_actors = ActionGenerator::collateral_damage_local( target, map );
     std::vector< Entity* > expansion_zone_entities = ActionGenerator::collateral_damage_expanded( *attack_location, map );
 
+    DamageProfile damage;
+    damage.weapons_used = tested_weapon;
+
+    hit( target, DIRECTED, damage );
+
+    if ( damage.has_area_effect() )
+        for ( auto it = area_of_effect_actors.begin(); it != area_of_effect_actors.end(); ++it ) 
+            hit( **it, AREA_OF_EFFECT, damage );
+
+    if ( damage.has_expanded_effect() )
+        for ( auto it = expansion_zone_entities.begin(); it != expansion_zone_entities.end(); ++it ) 
+            hit( **it, AREA_OF_EFFECT, damage );
+    
+
     // Generate the List for all affected entities
 
-        // CALCULATING FULL DAMAGE PROFILE
-        for (int i=0; i<tested_weapon.size(); ++i) {
+        // // CALCULATING FULL DAMAGE PROFILE
+        // for (int i=0; i<tested_weapon.size(); ++i) {
 
-            Effect * effect = tested_weapon[i]->get_monster_effect();
-            Effect * crew_effect = tested_weapon[i]->get_regular_effect();
-            int roll_result = roll_dice( effect->get_dice_count() );
+        //     Effect * effect = tested_weapon[i]->get_monster_effect();
+        //     Effect * crew_effect = tested_weapon[i]->get_regular_effect();
+        //     int roll_result = roll_dice( effect->get_dice_count() );
 
-            if ( effect->is_kill_type() ) {
+        //     if ( effect->is_kill_type() ) {
 
-                if ( tested_weapon[i]->hasAreaEffect() ) {
-                    damage_loc += roll_result;
-                    if ( tested_weapon[i]->hasExpandingEffect() )
-                        damage_exp += roll_result;
-                } else {
-                    damage_dir += roll_result;
-                }
+        //         if ( tested_weapon[i]->hasAreaEffect() ) {
+        //             damage_loc += roll_result;
+        //             if ( tested_weapon[i]->hasExpandingEffect() )
+        //                 damage_exp += roll_result;
+        //         } else {
+        //             damage_dir += roll_result;
+        //         }
 
-            } else if ( effect->is_stun_type() ) {
+        //     } else if ( effect->is_stun_type() ) {
 
-                if ( tested_weapon[i]->hasAreaEffect() ) {
-                    stun_loc += roll_result;
-                    if ( tested_weapon[i]->hasExpandingEffect() )
-                        stun_exp += roll_result;
-                } else {
-                    stun_dir += roll_result;
-                }
+        //         if ( tested_weapon[i]->hasAreaEffect() ) {
+        //             stun_loc += roll_result;
+        //             if ( tested_weapon[i]->hasExpandingEffect() )
+        //                 stun_exp += roll_result;
+        //         } else {
+        //             stun_dir += roll_result;
+        //         }
 
-            } else if ( effect->is_grow_type() ) {
+        //     } else if ( effect->is_grow_type() ) {
 
-                if ( tested_weapon[i]->hasAreaEffect() ) {
-                    grow_loc += 1;
-                    if ( tested_weapon[i]->hasExpandingEffect() )
-                        grow_exp += 1;
-                } else {
-                    grow_dir += 1;
-                }
+        //         if ( tested_weapon[i]->hasAreaEffect() ) {
+        //             grow_loc += 1;
+        //             if ( tested_weapon[i]->hasExpandingEffect() )
+        //                 grow_exp += 1;
+        //         } else {
+        //             grow_dir += 1;
+        //         }
             
-            } else if ( effect->is_shrink_type() ) {
+        //     } else if ( effect->is_shrink_type() ) {
 
-                if ( tested_weapon[i]->hasAreaEffect() ) {
-                    shrink_loc += 1;
-                    if ( tested_weapon[i]->hasExpandingEffect() )
-                        shrink_exp += 1;
-                } else {
-                    shrink_dir += 1;
-                }
+        //         if ( tested_weapon[i]->hasAreaEffect() ) {
+        //             shrink_loc += 1;
+        //             if ( tested_weapon[i]->hasExpandingEffect() )
+        //                 shrink_exp += 1;
+        //         } else {
+        //             shrink_dir += 1;
+        //         }
             
-            } else if ( effect->is_frag_type() ) {
+        //     } else if ( effect->is_frag_type() ) {
 
-                if ( tested_weapon[i]->hasAreaEffect() ) {
-                    fragment_loc += roll_result;
-                    if ( tested_weapon[i]->hasExpandingEffect() )
-                        fragment_exp += roll_result;
-                } else {
-                    fragment_dir += roll_result;
-                }
+        //         if ( tested_weapon[i]->hasAreaEffect() ) {
+        //             fragment_loc += roll_result;
+        //             if ( tested_weapon[i]->hasExpandingEffect() )
+        //                 fragment_exp += roll_result;
+        //         } else {
+        //             fragment_dir += roll_result;
+        //         }
 
-            }
+        //     }
 
-            if ( crew_effect && crew_effect->is_kill_type() ) {
+        //     if ( crew_effect && crew_effect->is_kill_type() ) {
 
-                if ( tested_weapon[i]->hasAreaEffect() ) {
-                    damage_loc_crew += roll_result;
-                    if ( tested_weapon[i]->hasExpandingEffect() )
-                        damage_exp_crew += roll_result;
-                } else {
-                    damage_dir += roll_result;
-                }
+        //         if ( tested_weapon[i]->hasAreaEffect() ) {
+        //             damage_loc_crew += roll_result;
+        //             if ( tested_weapon[i]->hasExpandingEffect() )
+        //                 damage_exp_crew += roll_result;
+        //         } else {
+        //             damage_dir += roll_result;
+        //         }
 
-            } else if ( crew_effect && crew_effect->is_stun_type() ) {
+        //     } else if ( crew_effect && crew_effect->is_stun_type() ) {
 
-                if ( tested_weapon[i]->hasAreaEffect() ) {
-                    stun_loc_crew += roll_result;
-                    if ( tested_weapon[i]->hasExpandingEffect() )
-                        damage_exp += roll_result;
-                } else {
-                    stun_exp_crew += roll_result;
-                }
+        //         if ( tested_weapon[i]->hasAreaEffect() ) {
+        //             stun_loc_crew += roll_result;
+        //             if ( tested_weapon[i]->hasExpandingEffect() )
+        //                 damage_exp += roll_result;
+        //         } else {
+        //             stun_exp_crew += roll_result;
+        //         }
 
-            }
+        //     }
 
-        }
+        // }
 
-        // VERBOSE DESCRIPTION
-        {
-        std::cout << "ATTACK RESOLUTION________________________________________" << std::endl;
-        std::cout << "int damage_dir = " << damage_dir << std::endl;
-        std::cout << "int damage_loc = " << damage_loc << std::endl;
-        std::cout << "int damage_exp = " << damage_exp << std::endl;
+        // // VERBOSE DESCRIPTION
+        // {
+        // std::cout << "ATTACK RESOLUTION________________________________________" << std::endl;
+        // std::cout << "int damage_dir = " << damage_dir << std::endl;
+        // std::cout << "int damage_loc = " << damage_loc << std::endl;
+        // std::cout << "int damage_exp = " << damage_exp << std::endl;
 
-        std::cout << "int stun_dir = " << stun_dir << std::endl;
-        std::cout << "int stun_loc = " << stun_loc << std::endl;
-        std::cout << "int stun_exp = " << stun_exp << std::endl;
+        // std::cout << "int stun_dir = " << stun_dir << std::endl;
+        // std::cout << "int stun_loc = " << stun_loc << std::endl;
+        // std::cout << "int stun_exp = " << stun_exp << std::endl;
 
-        std::cout << "int grow_dir = " << grow_dir << std::endl;
-        std::cout << "int grow_loc = " << grow_loc << std::endl;
-        std::cout << "int grow_exp = " << grow_exp << std::endl;
+        // std::cout << "int grow_dir = " << grow_dir << std::endl;
+        // std::cout << "int grow_loc = " << grow_loc << std::endl;
+        // std::cout << "int grow_exp = " << grow_exp << std::endl;
 
-        std::cout << "int shrink_dir = " << shrink_dir << std::endl;
-        std::cout << "int shrink_loc = " << shrink_loc << std::endl;
-        std::cout << "int shrink_exp = " << shrink_exp << std::endl;
+        // std::cout << "int shrink_dir = " << shrink_dir << std::endl;
+        // std::cout << "int shrink_loc = " << shrink_loc << std::endl;
+        // std::cout << "int shrink_exp = " << shrink_exp << std::endl;
 
-        std::cout << "int fragment_dir = " << fragment_dir << std::endl;
-        std::cout << "int fragment_loc = " << fragment_loc << std::endl;
-        std::cout << "int fragment_exp = " << fragment_exp << std::endl;
-        std::cout << "_________________________________________________________" << std::endl;
-        }
+        // std::cout << "int fragment_dir = " << fragment_dir << std::endl;
+        // std::cout << "int fragment_loc = " << fragment_loc << std::endl;
+        // std::cout << "int fragment_exp = " << fragment_exp << std::endl;
+        // std::cout << "_________________________________________________________" << std::endl;
+        // }
 
         // APPLY DAMAGE
-        {
-        int target_constitution = target.getConstitution();
-        Monster *  target_monster = static_cast< Monster* >( &target );
 
-        // GROW
-        if ( grow_dir || grow_loc || grow_exp ) {
+        // {
+        // int target_constitution = target.getConstitution();
+        // Monster *  target_monster = static_cast< Monster* >( &target );
 
-            grow_monster( *target_monster );
+        // // GROW
+        // if ( grow_dir || grow_loc || grow_exp ) {
 
-        }
-        // SHRINK
-        if ( shrink_dir || shrink_loc || shrink_exp ) {
+        //     grow_monster( *target_monster );
 
-            shrink_monster( *target_monster );
+        // }
+        // // SHRINK
+        // if ( shrink_dir || shrink_loc || shrink_exp ) {
 
-        }
-        // KILL
-        if ( target_constitution <= damage_dir + damage_loc + damage_exp ) {
+        //     shrink_monster( *target_monster );
 
-            target_monster->kill();
-            std::cout << "STATE- Monster(" << target_monster->getName() << ", " << target_monster->getID() 
-                        << ") has been killed." << std::endl;
+        // }
+        // // KILL
+        // if ( target_constitution <= damage_dir + damage_loc + damage_exp ) {
 
-        // FRAGMENT
-        } else if ( fragment_dir || fragment_loc || fragment_exp ) {
+        //     target_monster->kill();
+        //     std::cout << "STATE- Monster(" << target_monster->getName() << ", " << target_monster->getID() 
+        //                 << ") has been killed." << std::endl;
 
-            new_fragments = fragment_monster( *target_monster );
+        // // FRAGMENT
+        // } else if ( fragment_dir || fragment_loc || fragment_exp ) {
 
-        // STUN
-        } else if ( target_constitution <= stun_dir + stun_loc + stun_exp ) {
+        //     new_fragments = fragment_monster( *target_monster );
+
+        // // STUN
+        // } else if ( target_constitution <= stun_dir + stun_loc + stun_exp ) {
             
-            target_monster->stun();
-            for ( int f=0; f<new_fragments.size(); ++f )
-                new_fragments[f]->stun();
+        //     target_monster->stun();
+        //     for ( int f=0; f<new_fragments.size(); ++f )
+        //         new_fragments[f]->stun();
 
-        }
-        }
+        // }
+        // }
 
     // Remove Effect for Multi-Unknown condition
     if ( untested_weapon.size() > 1 ) {
@@ -931,6 +953,140 @@ void GameMaster::apply_crew_attack( Actor& target, std::vector<Crew*>& attack_te
     }
 
     std::cout << "Complete Attack" << std::endl;
+
+}
+
+Entity * GameMaster::hit( Entity& e, DAMAGE_TYPE type, DamageProfile& p ) {
+
+    int kill = 0;
+    int stun = 0;
+    int shrink = 0;
+    int grow = 0;
+    int fragment = 0;
+
+    p.roll();
+
+    if ( e.getType() == MONSTER ) {
+        
+        switch ( type ) {
+
+            case DIRECTED:
+                kill += p.damage_dir;
+                stun += p.stun_dir;
+                shrink += p.shrink_dir;
+                grow += p.grow_dir;
+                fragment += p.fragment_dir;
+
+            case AREA_OF_EFFECT:
+                kill += p.damage_loc;
+                stun += p.stun_loc;
+                shrink += p.shrink_loc;
+                grow += p.grow_loc;
+                fragment += p.fragment_loc;
+
+            case EXPANDED_AREA:
+                kill += p.damage_exp;
+                stun += p.stun_exp;
+                shrink += p.shrink_exp;
+                grow += p.grow_exp;
+                fragment += p.fragment_exp;
+
+        }
+
+        Monster * target = static_cast< Monster* >( &e );
+        int target_constitution = target->getConstitution();
+        std::vector< Monster* > new_fragments;
+
+        // GROW
+        if ( grow ) {
+
+            grow_monster( *target );
+            std::cout << "STATE- Monster(" << target->getName() << ", " << target->getID() 
+                        << ") has grown." << std::endl;
+
+        }
+        // SHRINK
+        if ( shrink ) {
+
+            shrink_monster( *target );
+            std::cout << "STATE- Monster(" << target->getName() << ", " << target->getID() 
+                        << ") has shrunk." << std::endl;
+
+        }
+        // KILL
+        if ( target_constitution <= kill ) {
+
+            target->kill();
+            std::cout << "STATE- Monster(" << target->getName() << ", " << target->getID() 
+                        << ") has been killed." << std::endl;
+
+        // FRAGMENT
+        } else if ( fragment ) {
+
+            new_fragments = fragment_monster( *target );
+            std::cout << "STATE- Monster(" << target->getName() << ", " << target->getID() 
+                        << ") has blown up." << std::endl;
+
+        // STUN
+        } else if ( target_constitution <= stun ) {
+            
+            target->stun();
+            std::cout << "STATE- Monster(" << target->getName() << ", " << target->getID() 
+                        << ") has been stunned." << std::endl;
+            for ( int f=0; f<new_fragments.size(); ++f )
+                new_fragments[f]->stun();
+
+        } else {
+
+            std::cout << "STATE- Monster(" << target->getName() << ", " << target->getID() 
+                        << ") survived attack unscathed." << std::endl;
+
+        }
+
+
+    } else if ( e.getType() == CREW ) {
+        
+        switch ( type ) {
+
+            case DIRECTED:
+                kill += p.damage_dir;
+
+            case AREA_OF_EFFECT:
+                kill += p.damage_loc_crew;
+                stun += p.stun_loc_crew;
+
+            case EXPANDED_AREA:
+                kill += p.damage_exp_crew;
+                stun += p.stun_exp_crew;
+
+        }
+
+        Crew * target = static_cast< Crew* >( &e );
+        int target_constitution = target->getConstitution();
+        
+        if ( target_constitution <= kill ) {
+
+            target->kill();
+            std::cout << "STATE- Crew(" << target->getName() << ", " << target->getID() 
+                        << ") has been killed." << std::endl;
+
+        // FRAGMENT
+        } else if ( target_constitution <= stun ) {
+            
+            target->stun();            
+            std::cout << "STATE- Crew(" << target->getName() << ", " << target->getID() 
+                        << ") has been stunned." << std::endl;
+
+        } else {
+
+            std::cout << "STATE- Monster(" << target->getName() << ", " << target->getID() 
+                        << ") survived attack unscathed." << std::endl;
+
+        }
+
+    }
+
+    return nullptr;
 
 }
 

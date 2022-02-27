@@ -4,12 +4,63 @@
 DamageProfile::DamageProfile() {
 
     mt_rand = ActionGenerator::random_engine();
+    init();
+    area_effect = 0;
+    expanded_effect = 0;
+
+}
+
+bool DamageProfile::has_area_effect() {
+
+    return area_effect;
+
+}
+bool DamageProfile::has_expanded_effect() {
+
+    return expanded_effect;
+
+}
+
+void DamageProfile::init() {
+
+    damage_dir = 0;
+    damage_loc = 0;
+    damage_exp = 0;
+    damage_loc_crew = 0;
+    damage_exp_crew = 0;
+
+    stun_dir = 0;
+    stun_loc = 0;
+    stun_exp = 0;
+    stun_loc_crew = 0;
+    stun_exp_crew = 0;
+
+    grow_dir = 0;
+    grow_loc = 0;
+    grow_exp = 0;
+
+    shrink_dir = 0;
+    shrink_loc = 0;
+    shrink_exp = 0;
+
+    fragment_dir = 0;
+    fragment_loc = 0;
+    fragment_exp = 0;
 
 }
 
 void DamageProfile::roll() {
 
+    init();
+
+    damage_dir += roll_dice( hand_to_hand_strikes );
+
     for (int i=0; i<weapons_used.size(); ++i) {
+
+        if ( weapons_used[i]->hasAreaEffect() )
+            area_effect = true;
+        if ( weapons_used[i]->hasExpandingEffect() )
+            expanded_effect = true;
 
         Effect * effect = weapons_used[i]->get_monster_effect();
         Effect * crew_effect = weapons_used[i]->get_regular_effect();

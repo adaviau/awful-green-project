@@ -11,6 +11,8 @@
 #include "monster.h"
 #include "weapon.h"
 
+#include "damage_profile.h"
+
 #include "initializer.h"
 #include "action_generator.h"
 
@@ -58,6 +60,8 @@ private:
 
     void shrink_monster( Monster& );
     std::vector< Monster* > fragment_monster( Monster& );
+
+    Entity* hit( Entity&, DAMAGE_TYPE, DamageProfile& );
 
     void apply_crew_attack( Actor&, std::vector< Crew* >& );    
     void apply_monster_attack( Actor&, std::vector< Monster* >& );
