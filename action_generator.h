@@ -5,6 +5,7 @@
 #include <stack>
 #include <random>
 #include <algorithm>
+#include <chrono>
 
 #include "manifest.h"
 #include "map.h"

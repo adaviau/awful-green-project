@@ -15,6 +15,14 @@ Location::Location( std::string n, int i ) {
 
 }
 
+Location::Location( std::string n, int i, std::vector<int> con, std::vector<int> los, std::vector<int> exp ) : Location( n, i ) {
+
+    room_connections = con;
+    room_sightlines = los;
+    room_expansions = exp;
+
+}
+
 void Location::add_connection( int i ) {
 
     room_connections.push_back( i );

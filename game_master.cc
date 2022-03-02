@@ -6,10 +6,10 @@ GameMaster::GameMaster() : GameMaster( 500 ) { }
 
 GameMaster::GameMaster( int turn_option ) : turn( 0 ), max_turns( turn_option ) {
 
-    max_fragment_monsters = 15;
-    max_egg_monsters = 10;
-    max_baby_monsters = 3;
-    max_adult_monsters = 3;
+    max_fragment_monsters = 22;
+    max_egg_monsters = 19;
+    max_baby_monsters = 18;
+    max_adult_monsters = 12;
 
 }
 
@@ -17,9 +17,8 @@ void GameMaster::init() {
 
     mt_rand = ActionGenerator::random_engine();
 
-    Initializer::buildMap( map );
-    Initializer::buildCrew( crew );
-    Initializer::buildMonsters( monsters );
+    Initializer::build_complete_map( map );
+    Initializer::build_complete_crew( crew );
     Initializer::buildWeapons( weapons );
     Initializer::buildEffects( effects );
 
@@ -29,21 +28,114 @@ void GameMaster::init() {
 
 }
 
-void GameMaster::crew_placement() { 
+void GameMaster::crew_placement() {
 
-    crew[0].enter( map[0] );
-    crew[1].enter( map[2] );
-    crew[2].enter( map[4] );
-    crew[3].enter( map[1] );
-    crew[4].enter( map[1] );
+    crew[0].enter( map[3] );    
+    crew[1].enter( map[3] );
+    crew[2].enter( map[3] );
+    crew[3].enter( map[31] );
+    crew[4].enter( map[9] );
+    crew[5].enter( map[22] );
+    crew[6].enter( map[28] );
+    crew[7].enter( map[28] );
+    crew[8].enter( map[3] );
+    crew[9].enter( map[7] );
+    crew[10].enter( map[7] );
+    crew[11].enter( map[30] );
+    crew[12].enter( map[21] );
+    crew[13].enter( map[3] );
+    crew[14].enter( map[0] );
+    crew[15].enter( map[30] );
+    crew[16].enter( map[30] );
+    crew[17].enter( map[23] );
+    crew[18].enter( map[1] );
+    crew[19].enter( map[1] );
+    crew[20].enter( map[30] );
+    crew[21].enter( map[2] );       
 
 }
+
+// void GameMaster::crew_placement_test() { 
+
+//     crew[0].enter( map[0] );
+//     crew[1].enter( map[2] );
+//     crew[2].enter( map[4] );
+//     crew[3].enter( map[1] );
+//     crew[4].enter( map[1] );
+
+// }
 void GameMaster::monster_placement() {
 
-    monsters[3].enter( map[0] );
-    monsters[0].enter( map[1] );
-    monsters[1].enter( map[5] );
-    monsters[2].enter( map[4] );
+    int result = roll_dice( 1 );
+
+    switch ( result ) {
+
+        case 1:
+            Initializer::build_complete_monsters( monsters, 6, 4, 2 );
+            break;
+        case 2:
+            Initializer::build_complete_monsters( monsters, 6, 3, 3 );
+            break;
+        case 3:
+            Initializer::build_complete_monsters( monsters, 5, 4, 3 );
+            break;
+        case 4:
+            Initializer::build_complete_monsters( monsters, 4, 4, 4 );
+            break;
+        case 5:
+            Initializer::build_complete_monsters( monsters, 2, 5, 4 );
+            break;
+        case 6:
+            Initializer::build_complete_monsters( monsters, 1, 6, 4 );
+            break;
+
+    }
+
+    result = roll_dice( 1 );
+    std::vector< Monster* > placement_order = ActionGenerator::shuffled_monster_list( monsters );
+
+    switch ( result ) {
+
+        case 6:
+            result = roll_dice( 1 ) % 5;
+
+        case 1:
+            placement_order[0]->enter( map[4] );
+            break;
+        case 2:
+            placement_order[0]->enter( map[24] );
+            break;
+        case 3:
+            placement_order[0]->enter( map[13] );
+            break;
+        case 4:
+            placement_order[0]->enter( map[14] );
+            break;
+        case 5:
+            placement_order[0]->enter( map[15] );
+            break;
+
+    }
+
+    std::vector< Location* > placement_locations = ActionGenerator::shuffled_location_list( map );
+ 
+    int index = 0;
+    for ( int i=1; i<placement_order.size(); ++i ) {
+
+        while ( true ) {
+
+            if (  ActionGenerator::get_crew_targets( *placement_locations[ index ], map ).size() == 0 ) {
+                placement_order[i]->enter( *placement_locations[ index ] );
+                ++index;
+                break;
+            }
+            else {
+                ++index;
+            }
+
+        }
+
+    }
 
 }
 void GameMaster::weapon_placement() {
@@ -57,6 +149,33 @@ void GameMaster::weapon_placement() {
     bottle_of_acid->set_respawn_location( map[0] );
     // std::cout << "is fence deployable " << fence->isDeployable() << std::endl;
     // fence->deploy( map[8] );
+
+}
+
+void GameMaster::run_design_loading() {
+
+    map.debug();
+
+    for ( int i=0; i<map.size(); ++i ) {
+        for ( int j=0; j<map[i].room_connections.size(); ++j ) {
+
+            std::cout << map[i].getName() << ": CON: " << map[i].room_connections[j] << ", ";
+
+        }
+        std::cout << std::endl;
+        for ( int j=0; j<map[i].room_sightlines.size(); ++j ) {
+
+            std::cout << map[i].getName() << ": LOS: " << map[i].room_sightlines[j] << ", ";
+
+        }
+        std::cout << std::endl;
+        for ( int j=0; j<map[i].room_expansions.size(); ++j ) {
+
+            std::cout << map[i].getName() << ": EXP: " << map[i].room_expansions[j] << ", ";
+
+        }
+        std::cout << std::endl;
+    }
 
 }
 
@@ -291,6 +410,9 @@ void GameMaster::run_design() {
 }
 
 void GameMaster::run() {
+
+    crew.debug();
+    monsters.debug();
 
     crew_discovers_monsters();
 

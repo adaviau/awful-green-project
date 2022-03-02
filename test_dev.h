@@ -6,7 +6,7 @@ void test1_1() {
     Manifest monsters;
     Manifest weapons;
 
-    Initializer::buildMap( map );
+    Initializer::build_test_map( map );
     Initializer::buildCrew( crew );
     Initializer::buildMonsters( monsters );
     Initializer::buildWeapons( weapons );
@@ -25,7 +25,7 @@ void test1_1() {
 void test3() {
 
     Map map;
-    Initializer::buildMap( map );
+    Initializer::build_test_map( map );
 
     Manifest crew;
 
@@ -89,7 +89,7 @@ void test1() {
     Manifest monsters;
     Manifest weapons;
 
-    Initializer::buildMap( map );
+    Initializer::build_test_map( map );
     Initializer::buildCrew( crew );
     Initializer::buildMonsters( monsters );
     Initializer::buildWeapons( weapons );

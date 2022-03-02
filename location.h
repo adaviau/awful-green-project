@@ -24,6 +24,7 @@ public:
     Location();
     Location( std::string, int );
     Location( std::string, int, int );
+    Location( std::string, int, std::vector<int>, std::vector<int> , std::vector<int>  );
 
     void add_connection( int );
     void add_sightline( int );

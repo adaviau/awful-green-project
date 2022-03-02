@@ -43,7 +43,7 @@ void test_crew_accessor() {
 void test_location_accessor() {
     
     Map map;
-    Initializer::buildMap( map );
+    Initializer::build_test_map( map );
     std::vector< Location* > list = ActionGenerator::shuffled_location_list( map );
 
     std::cout << "Map Order:" << std::endl;

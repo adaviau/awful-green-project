@@ -2,13 +2,13 @@
 
 #include "game_master.h"
 
-#include "test_dev.h"
-#include "test_weapon_effects.h"
-// #include "test_map.h"
-#include "test_battle.h"
-#include "test_monster_grow.h"
-#include "test_weapon_grabs.h"
-#include "test_accessors.h"
+// #include "test_dev.h"
+// #include "test_weapon_effects.h"
+// // #include "test_map.h"
+// #include "test_battle.h"
+// #include "test_monster_grow.h"
+// #include "test_weapon_grabs.h"
+// #include "test_accessors.h"
 
 
 int main( int argc, char *argv[] ) {
