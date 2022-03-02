@@ -11,7 +11,7 @@ Location& Map::getLocation( int idx ) { return locations[idx]; }
 Location& Map::operator[]( int index ) {
 
     if ( index >= size() ) {
-        std::cerr << "Array index out of bound, exiting";
+        std::cerr << "Array index out of bound map[" << index << "], exiting";
         exit(0);
     }
     return locations[index];

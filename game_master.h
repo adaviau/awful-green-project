@@ -75,6 +75,7 @@ public:
     void run();
 
     int roll_dice( int );
+    int choose_one( std::vector<int> );
 
 
 

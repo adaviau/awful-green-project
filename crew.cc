@@ -52,7 +52,9 @@ Weapon * Crew::getWeapon() {
 
 void Crew::drop() {  
 
-    weapon->drop( *location );
-    weapon = nullptr; 
+    if ( weapon ) {
+        weapon->drop( *location );
+        weapon = nullptr; 
+    }
     
 }

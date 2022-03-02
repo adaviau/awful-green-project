@@ -316,6 +316,84 @@ void Initializer::buildMonsters( Manifest& m ) {
 
 }
 
+void Initializer::build_complete_weapons( Manifest& m ) {
+
+    for ( int i=0; i<3; ++i ) {
+        Weapon * w = new Weapon( "Bottle of Acid" );
+        w->set_single_use();
+        w->set_respawning();
+        w->set_ranged();
+        m.add( *w );
+    }
+
+    for ( int i=0; i<3; ++i ) {
+        Weapon * w = new Weapon( "Cannister of Zgwortz" );
+        w->set_single_use();
+        w->set_respawning();
+        w->set_ranged();
+        m.add( *w );
+    }
+        
+    for ( int i=0; i<2; ++i ) {
+        Weapon * w = new Weapon( "Communications Beamer" );
+        w->set_area_of_effect();
+        w->set_ranged();
+        m.add( *w );
+    }
+    
+    for ( int i=0; i<2; ++i ) {
+        Weapon * w = new Weapon( "Fire Extinguisher" );
+        w->set_area_of_effect();
+        w->set_ranged();
+        m.add( *w );
+    }
+    
+    for ( int i=0; i<3; ++i ) {
+        Weapon * w = new Weapon( "Gas Grenade" );
+        w->set_area_of_effect();
+        w->set_expanding();
+        w->set_respawning();
+        w->set_ranged();
+        m.add( *w );
+    }
+    
+    for ( int i=0; i<2; ++i ) {
+        Weapon * w = new Weapon( "Hypodermic" );
+        m.add( *w );
+    }
+    
+    for ( int i=0; i<3; ++i ) {
+        Weapon * w = new Weapon( "Knife" );
+        m.add( *w );
+    }
+    
+    for ( int i=0; i<2; ++i ) {
+        Weapon * w = new Weapon( "Pool Stick" );
+        m.add( *w );
+    }
+    
+    for ( int i=0; i<3; ++i ) {
+        Weapon * w = new Weapon( "Rocket Fuel" );
+        w->set_area_of_effect();
+        w->set_ranged();
+        w->set_expanding();
+        w->set_respawning();
+        m.add( *w );
+    }
+
+    for ( int i=0; i<2; ++i ) {
+        Weapon * w = new Weapon( "Stun Pistol" );
+        w->set_ranged();
+        m.add( *w );
+    }
+    
+    for ( int i=0; i<2; ++i ) {
+        Weapon * w = new Weapon( "Welding Torch" );
+        m.add( *w );
+    }
+
+}
+
 void Initializer::buildWeapons( Manifest& m ) {
 
     Weapon * bottle_of_acid = new Weapon( "Bottle of Acid" );

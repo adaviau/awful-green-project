@@ -449,7 +449,7 @@ Effect * ActionGenerator::get_available_effect( std::vector< Effect* >& m ) {
         if ( m[i]->is_available() )
             return m[i];
 
-    return nullptr;
+    return m[0];
 
 }
 

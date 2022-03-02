@@ -19,7 +19,8 @@ void GameMaster::init() {
 
     Initializer::build_complete_map( map );
     Initializer::build_complete_crew( crew );
-    Initializer::buildWeapons( weapons );
+    Initializer::build_complete_weapons( weapons );
+
     Initializer::buildEffects( effects );
 
     crew_placement();
@@ -140,15 +141,65 @@ void GameMaster::monster_placement() {
 }
 void GameMaster::weapon_placement() {
 
-    weapons[0].enter( map[1] );
-    weapons[1].enter( map[4] );
-    weapons[2].enter( map[4] );
-    weapons[3].enter( map[0] );
-    weapons[4].enter( map[0] );
-    Weapon * bottle_of_acid = static_cast< Weapon* >( &weapons[0] );
-    bottle_of_acid->set_respawn_location( map[0] );
-    // std::cout << "is fence deployable " << fence->isDeployable() << std::endl;
-    // fence->deploy( map[8] );
+    std::cout << "DEBUG- weapon_placement(): " << weapons.size() <<     std::endl;
+    std::cout << "DEBUG- map_size(): " << map.size() <<     std::endl;
+
+    for ( int i=0; i<weapons.size(); ++i ) {
+
+        Weapon * ptr = static_cast< Weapon * > ( &weapons[i] );
+        std::cout << "VERBOSE- " << ptr->getName() << "(" << ptr->getID() << ")" << std::endl;
+
+        if ( ptr->getName() == "Bottle of Acid" ) {
+
+            ptr->enter( map[24] );
+            ptr->set_respawn_location( map[24] );
+
+        } else if ( ptr->getName() == "Cannister of Zgwortz" ) {
+
+            ptr->enter( map[ 21 ] );
+            ptr->set_respawn_location( map[ 21 ] );
+
+        } else if ( ptr->getName() == "Communications Beamer" ) {
+
+            ptr->enter( map[ 0 ] );
+
+        } else if ( ptr->getName() == "Fire Extinguisher" ) {
+
+            ptr->enter( map[ 25 ] );
+
+        } else if ( ptr->getName() == "Gas Grenade" ) {
+
+            ptr->enter( map[ 29 ] );
+            ptr->set_respawn_location( map[ 29 ] );
+
+        } else if ( ptr->getName() == "Hypodermic" ) {
+
+            ptr->enter( map[ 28 ] );
+
+        } else if ( ptr->getName() == "Knife" ) {
+
+            ptr->enter( map[ 21 ] );
+
+        } else if ( ptr->getName() == "Pool Stick" ) {
+
+            ptr->enter( map[ 7 ] );
+
+        } else if ( ptr->getName() == "Rocket Fuel" ) {
+
+            ptr->enter( map[ 8 ] );
+            ptr->set_respawn_location( map[ 8 ] );
+
+        } else if ( ptr->getName() == "Stun Pistol" ) {
+
+            ptr->enter( map[ 3 ] );
+
+        } else if ( ptr->getName() == "Welding Torch" ) {
+
+            ptr->enter( map[ 25 ] );
+
+        }
+
+    }
 
 }
 
@@ -1118,11 +1169,12 @@ Entity * GameMaster::hit( Entity& e, DAMAGE_TYPE type, DamageProfile& p ) {
         
         if ( target_constitution <= kill ) {
 
+            target->drop();
             target->kill();
             std::cout << "STATE- Crew(" << target->getName() << ", " << target->getID() 
                         << ") has been killed." << std::endl;
 
-        // FRAGMENT
+        // STUN
         } else if ( target_constitution <= stun ) {
             
             target->stun();            
@@ -1332,10 +1384,30 @@ std::vector< Monster* > GameMaster::fragment_monster( Monster& monster ) {
 
 int GameMaster::roll_dice( int n ) {
 
-    if ( n<1 )
+    if ( n < 1 )
         return 0;
 
     std::uniform_int_distribution<int> range( 1, 6 );
     return range( mt_rand ) + roll_dice( n-1 );
+
+}
+
+int GameMaster::choose_one( std::vector<int> set ) {
+
+    if ( set.size() < 1 )
+        return 0;
+
+    std::cout << "VERBOSE- Choose between (";
+    for ( int i=0; i<set.size(); ++i )
+        std::cout << set[i] << ", ";    
+    std::cout << ")";
+
+    std::uniform_int_distribution<int> range( 1, set.size() );
+
+    int choice = range( mt_rand );
+    std::cout << " : Choose (" << choice << ")" << std::endl;
+    std::cout << " : OR set[" << choice << "] which equals " << set[ choice-1 ] << std::endl;
+
+    return set[ choice-1 ];
 
 }
