@@ -13,7 +13,7 @@
 
 int main( int argc, char *argv[] ) {
 
-    int turn_count = 50;
+    int turn_count = 250;
     if ( argc > 1 )
         turn_count = std::atoi( argv[1] );
 

@@ -9,7 +9,12 @@ GameMaster::GameMaster( int turn_option ) : turn( 0 ), max_turns( turn_option ) 
     max_fragment_monsters = 22;
     max_egg_monsters = 19;
     max_baby_monsters = 18;
-    max_adult_monsters = 12;
+    max_adult_monsters = 18;
+
+    // max_fragment_monsters = 8;
+    // max_egg_monsters = 10;
+    // max_baby_monsters = 8;
+    // max_adult_monsters = 5;
 
 }
 
@@ -141,13 +146,13 @@ void GameMaster::monster_placement() {
 }
 void GameMaster::weapon_placement() {
 
-    std::cout << "DEBUG- weapon_placement(): " << weapons.size() <<     std::endl;
-    std::cout << "DEBUG- map_size(): " << map.size() <<     std::endl;
+    // std::cout << "DEBUG- weapon_placement(): " << weapons.size() <<     std::endl;
+    // std::cout << "DEBUG- map_size(): " << map.size() <<     std::endl;
 
     for ( int i=0; i<weapons.size(); ++i ) {
 
         Weapon * ptr = static_cast< Weapon * > ( &weapons[i] );
-        std::cout << "VERBOSE- " << ptr->getName() << "(" << ptr->getID() << ")" << std::endl;
+        // std::cout << "VERBOSE- " << ptr->getName() << "(" << ptr->getID() << ")" << std::endl;
 
         if ( ptr->getName() == "Bottle of Acid" ) {
 
@@ -269,8 +274,6 @@ void GameMaster::run_design_collateral() {
         std::cout << "Gas Grenade has NO regular effect" << std::endl;
 
 
-
-
 }
 
 void GameMaster::run_design_fragment() {
@@ -379,11 +382,11 @@ void GameMaster::run_design_weapons() {
     std::cout << "First one is: " << effects[0]->getName() << std::endl;
     std::cout << "  Available: " << effects[0]->is_available() << std::endl;
 
-    ActionGenerator::get_available_effect( effects );
-    std::cout << "Is the Pool Queue tested: " << pool_queue->isTested() << std::endl;
-    std::cout << "  Quene Effect: " << pool_queue->get_monster_effect() << std::endl;
-    std::cout << "First one is: " << effects[0]->getName() << std::endl;
-    std::cout << "  Available: " << effects[0]->is_available() << std::endl;
+    // ActionGenerator::get_available_effect( effects );
+    // std::cout << "Is the Pool Queue tested: " << pool_queue->isTested() << std::endl;
+    // std::cout << "  Quene Effect: " << pool_queue->get_monster_effect() << std::endl;
+    // std::cout << "First one is: " << effects[0]->getName() << std::endl;
+    // std::cout << "  Available: " << effects[0]->is_available() << std::endl;
 
     // pool_queue->remove_effect( );
 
@@ -462,34 +465,47 @@ void GameMaster::run_design() {
 
 void GameMaster::run() {
 
-    crew.debug();
-    monsters.debug();
+    // crew.debug();
+    // monsters.debug();
+
+    bool winner = false;
 
     crew_discovers_monsters();
+    crew_turn();
 
     while ( ++turn <= max_turns ) {
 
         monster_turn();
-        crew_turn();
-
-        if ( check_win_conditions() )
+        if ( (winner = check_win_conditions()) )
             break;
+
+        crew_turn();
+        if ( (winner = check_win_conditions()) )
+            break;
+
 
     }
 
-    std::cout << "Game ran for " << turn-1 << " turns." << std::endl;
+    // std::cout << "Game ran for " << turn-1 << " turns." << std::endl;
+
+    if ( !winner )
+        std::cout << std::endl << "NO WINNING TEAM" << std::endl;
+    std::cout << std::endl << summarize_game();
 
 }
 
 void GameMaster::crew_turn() {
 
-    // GRAB, MOVE, ATTACK, WAKE
-
-    std::cout << "\nTurn " << turn << " ------------- CREWMEN" << std::endl;
-    crew.debug();
-    std::cout << "------------------------- CREWMEN" << std::endl;
+    // std::string line_prefix = ""
+                                
+    std::cout << std::endl;
+    std::cout << "Turn " << turn << " - CREW" << std::endl;
+    // crew.debug();
+    std::cout << "-------------------------" << std::endl;
     
-    std::cout << "\n******** PICKUP PHASE ******" << std::endl;
+    std::cout << std::endl;
+    std::cout << "Turn " << turn << " - ******** PICKUP PHASE *******" << std::endl;
+
     std::vector< Crew* > list = ActionGenerator::shuffled_crew_list( crew );
 
     // weapons.debug();
@@ -499,19 +515,19 @@ void GameMaster::crew_turn() {
     for (auto it = list.begin(); it != list.end(); ++it) {
 
         if ( (*it)->canGrabWeapon() ) {
-            std::cout << "DEBUG-- " << (*it)->getName() << " can grab weapon." << std::endl;
+            // std::cout << "DEBUG-- " << (*it)->getName() << " can grab weapon." << std::endl;
         } else {
-            std::cout << "DEBUG-- " << (*it)->getName() << " can grab weapon." << std::endl;
+            // std::cout << "DEBUG-- " << (*it)->getName() << " cannot grab weapon." << std::endl;
             continue;
         }
 
         int option_count = 1;
 
         if ( (*it)->hasWeapon() ) {
-            std::cout << "DEBUG-- " << (*it)->getName() << " is armed: " << std::endl;
+            // std::cout << "DEBUG-- " << (*it)->getName() << " is armed: " << std::endl;
             ++option_count;
         } else {
-            std::cout << "DEBUG-- " << (*it)->getName() << " is unarmed: " << std::endl;
+            // std::cout << "DEBUG-- " << (*it)->getName() << " is unarmed: " << std::endl;
         }
 
         Location *crew_location = (*it)->getLocation();
@@ -522,26 +538,27 @@ void GameMaster::crew_turn() {
         std::vector< Crew* > trade_options = 
             ActionGenerator::get_armed_crew_except_self( *it, *crew_location, map );
 
-        std::cout << "DEBUG-- ground size: " << ground_weapons.size() << std::endl;        
-        std::cout << "DEBUG-- tradable size: " << trade_options.size() << std::endl;
+        // std::cout << "DEBUG-- ground size: " << ground_weapons.size() << std::endl;        
+        // std::cout << "DEBUG-- tradable size: " << trade_options.size() << std::endl;
         option_count += ground_weapons.size();
 
         option_count += trade_options.size();
 
 
-        std::cout << "There are " << option_count << " weapon action(s) to choose.";
+        // std::cout << "There are " << option_count << " weapon action(s) to choose.";
         std::uniform_int_distribution<int> range( 0, option_count-1 );
         int action_choice = range( mt_rand );
-        std::cout << " Selecting weapon option: " << action_choice << std::endl;
+        // std::cout << " Selecting weapon option: " << action_choice << std::endl;
 
         if ( action_choice == 0 ) {
             // Do Nothing
-            std::cout << "DEBUG-- No weapon action" << std::endl;
+            std::cout << "EVENT- " << (*it)->getName() << " does nothing." << std::endl;
             continue;
         }
         if ( (*it)->hasWeapon() && action_choice == 1 ) {
             // Drop Weapon
-            std::cout << "DEBUG-- Weapon dropped" << std::endl;
+            std::cout << "EVENT- " << (*it)->getName() << " drop weapon(" 
+                    << (*it)->getWeapon()->getName() << ")" << std::endl;
             (*it)->drop();
             continue;
         }
@@ -552,7 +569,8 @@ void GameMaster::crew_turn() {
         }
 
         if ( action_choice < ground_weapons.size() ) {
-            std::cout << "DEBUG-- Grabbing ground weapon" << std::endl;
+            std::cout << "EVENT- " << (*it)->getName() << " takes ground weapon(" 
+                    << ground_weapons[action_choice]->getName() << ")" << std::endl;
             (*it)->grab( *ground_weapons[action_choice] );
             continue;
         }
@@ -570,12 +588,16 @@ void GameMaster::crew_turn() {
         trade_options[action_choice]->drop();
         // std::cout << "Make him drop the weapon!\n";
 
-        std::cout << "DEBUG-- Grab held weapon" << std::endl;
+        std::cout << "EVENT- " << (*it)->getName() << " takes held weapon(" << weapon_to_steal->getName() 
+                    << ")" << std::endl;
         (*it)->grab( *weapon_to_steal );
 
     }
     
-    std::cout << "\n****** MOVEMENT PHASE ******" << std::endl;
+    std::cout << std::endl;
+    std::cout << "Turn " << turn << " - ******* MOVEMENT PHASE ******" << std::endl;
+
+    list = ActionGenerator::shuffled_crew_list( crew );
     // Move
     for (auto it = list.begin(); it != list.end(); ++it) {            
   
@@ -584,21 +606,23 @@ void GameMaster::crew_turn() {
             
             std::uniform_int_distribution<int> range( 0, move_to.size()-1 );
             (*it)->enter( *move_to[ range( mt_rand ) ] );
-            std::cout << (*it)->getName() << "(" << (*it)->getID() << ")";
+            std::cout << "EVENT- " << (*it)->getName() << "(" << (*it)->getID() << ")";
             std::cout << " moved to " << (*it)->getLocation()->getName() << std::endl;
 
         }
     }
 
     
-    std::cout << "\n****** ATTACK PHASE ******" << std::endl;
-    crew.debug();
-    monsters.debug();
-    map.debug();
-    std::cout << "**************************" << std::endl;
+    std::cout << std::endl;
+    std::cout << "Turn " << turn << " - ******** ATTACK PHASE *******" << std::endl;
+
+    // crew.debug();
+    // monsters.debug();
+    // map.debug();
+    // std::cout << "**************************" << std::endl;
     // Attack
 
-    std::cout << "VERBOSE- generating random location list" << std::endl;
+    // std::cout << "VERBOSE- generating random location list" << std::endl;
     std::vector< Location* > location_list = ActionGenerator::shuffled_location_list( map );
 
     // weapons.debug();
@@ -606,21 +630,21 @@ void GameMaster::crew_turn() {
     for (auto it = location_list.begin(); it != location_list.end(); ++it) {
 
         // GET TARGET LIST AT LOCATION
-        std::cout << "VERBOSE- generating target(s) list" << std::endl;
+        // std::cout << "VERBOSE- generating target(s) list" << std::endl;
         std::vector< Monster* > targets = ActionGenerator::get_monster_targets_near( **it, map );
 
         if ( targets.size() < 1 ) {
-            std::cout << "STATE-- " << "There are " << targets.size() << " target(s) in the " 
-                        << (*it)->getName() << std::endl;
+            // std::cout << "STATE-- " << "There are " << targets.size() << " target(s) in the " 
+            //             << (*it)->getName() << std::endl;
             continue;
         }
 
         // GET ALL CREW THAT CAN ATTACK HERE
-        std::cout << "VERBOSE- generating attacker(s) list" << std::endl;
+        // std::cout << "VERBOSE- generating attacker(s) list" << std::endl;
         std::vector< Crew* > attackers = ActionGenerator::crew_that_can_attack( **it, crew );
 
-        std::cout << "STATE-- " << "There are " << targets.size() << " target(s) and " << 
-            attackers.size() << " attacker(s)" << " in the " << (*it)->getName() << std::endl;  
+        // std::cout << "STATE-- " << "There are " << targets.size() << " target(s) and " << 
+        //     attackers.size() << " attacker(s)" << " in the " << (*it)->getName() << std::endl;  
         
         if ( attackers.size() < 1 ) {
             continue;
@@ -631,7 +655,7 @@ void GameMaster::crew_turn() {
 
             if ( !targets[i]->isAlive() ) {
 
-                std::cout << "DEBUG-- Targetted entity is already dead... Skipping to next target" << std::endl;
+                // std::cout << "DEBUG-- Targetted entity is already dead... Skipping to next target" << std::endl;
                 continue;
 
             }
@@ -641,20 +665,20 @@ void GameMaster::crew_turn() {
             int team_size = range( mt_rand );
 
             if ( team_size == 0 ) {
-                std::cout << "DEBUG-- " << "No Attack team for this enemy." << std::endl;
+                // std::cout << "DEBUG-- " << "No Attack team for this enemy." << std::endl;
                 continue;
             }
 
-            std::cout << "DEBUG-- " << "Building attack team of size " << team_size <<
-                " from " << attackers.size() << " available attackers." << std::endl;
+            // std::cout << "DEBUG-- " << "Building attack team of size " << team_size <<
+            //     " from " << attackers.size() << " available attackers." << std::endl;
 
             std::vector< Crew* > attack_team;
             for (int j=0; j<team_size; ++j) {
                 attack_team.push_back( attackers[attackers.size()-1 ] );
                 attackers.pop_back();
             }
-            std::cout << "DEBUG-- " << "Team attacking " << targets[i]->getName() << 
-                " is of size " << attack_team.size() << std::endl;
+            // std::cout << "DEBUG-- " << "Team attacking " << targets[i]->getName() << 
+            //     " is of size " << attack_team.size() << std::endl;
             
             // APPLY ATTACKS
             apply_crew_attack( *targets[i], attack_team );
@@ -667,16 +691,26 @@ void GameMaster::crew_turn() {
     // Wake Up
 
     // WAKE PREVIOUSLY STUNNED CREW
+    std::cout << std::endl;
+    std::cout << "Turn " << turn << " - ********* WAKE PHASE ********" << std::endl;
 
     // RESET TURN FOR NEXT ROUND
     for ( int i=0; i<crew.size(); ++i ) {
 
         Actor * cursor = static_cast< Actor* >( &crew[i] );
 
-        if ( cursor->canWake() )
-            cursor->wakeup();
-        else 
+        if ( cursor->canWake() ) {
+
+            if ( cursor->isStunned() ) {
+                std::cout << "EVENT- " << cursor->getName() << " recovers from stun." << std::endl;
+                cursor->wakeup();
+            }
+
+        } else {
+
             cursor->set_wakeable();
+
+        }
     
         cursor->reset_turn();
 
@@ -688,13 +722,21 @@ void GameMaster::monster_turn() {
 
     // GROW, MOVE, ATTACK, WAKE
 
-    std::cout << "Turn " << turn << " - Monsters" << std::endl;
+    std::cout << std::endl;
+    std::cout << "Turn " << turn << " - MONSTER" << std::endl;
+    // crew.debug();
+    std::cout << "-------------------------" << std::endl;
+    
+    std::cout << std::endl;
+    std::cout << "Turn " << turn << " - ********* GROW PHASE ********" << std::endl;
+
     std::vector< Monster* > list = ActionGenerator::shuffled_monster_list( monsters );
 
     // Grow
     grow_monsters();
 
-    // std::cout << "--Movement Phase" << std::endl;
+    std::cout << std::endl;
+    std::cout << "Turn " << turn << " - ******* MOVEMENT PHASE ******" << std::endl;
     // Move
     list = ActionGenerator::shuffled_monster_list( monsters );
     for (auto it = list.begin(); it != list.end(); ++it) {            
@@ -711,26 +753,28 @@ void GameMaster::monster_turn() {
         }
     }
 
+    std::cout << std::endl;
+    std::cout << "Turn " << turn << " - ******** ATTACK PHASE *******" << std::endl;
     // Attack
     std::vector< Location* > location_list = ActionGenerator::shuffled_location_list( map );
     for (auto it = location_list.begin(); it != location_list.end(); ++it) {
 
         // GET TARGET LIST AT LOCATION
-        std::cout << "VERBOSE- generating target(s) list" << std::endl;
+        // std::cout << "VERBOSE- generating target(s) list" << std::endl;
         std::vector< Crew* > targets = ActionGenerator::get_crew_targets( **it, map );
 
         if ( targets.size() < 1 ) {
-            std::cout << "STATE-- " << "There are " << targets.size() << " target(s) in the " 
-                        << (*it)->getName() << std::endl;
+            // std::cout << "STATE-- " << "There are " << targets.size() << " target(s) in the " 
+            //             << (*it)->getName() << std::endl;
             continue;
         }
 
         // GET ALL MONSTERS THAT CAN ATTACK HERE
-        std::cout << "VERBOSE- generating attacker(s) list" << std::endl;
+        // std::cout << "VERBOSE- generating attacker(s) list" << std::endl;
         std::vector< Monster* > attackers = ActionGenerator::monsters_that_can_attack( **it, monsters );
 
-        std::cout << "STATE-- " << "There are " << targets.size() << " target(s) and " << 
-            attackers.size() << " attacker(s)" << " in the " << (*it)->getName() << std::endl;  
+        // std::cout << "STATE-- " << "There are " << targets.size() << " target(s) and " << 
+        //     attackers.size() << " attacker(s)" << " in the " << (*it)->getName() << std::endl;  
         
         if ( attackers.size() < 1 ) {
             continue;
@@ -744,21 +788,21 @@ void GameMaster::monster_turn() {
             int team_size = range( mt_rand );
 
             if ( team_size == 0 ) {
-                std::cout << "DEBUG-- " << "No Attack team for this enemy." << std::endl;
+                // std::cout << "DEBUG-- " << "No Attack team for this enemy." << std::endl;
                 continue;
             }
 
 
-            std::cout << "DEBUG-- " << "Building attack team of size " << team_size <<
-                " from " << attackers.size() << " available attackers." << std::endl;
+            // std::cout << "DEBUG-- " << "Building attack team of size " << team_size <<
+            //     " from " << attackers.size() << " available attackers." << std::endl;
 
             std::vector< Monster* > attack_team;
             for (int j=0; j<team_size; ++j) {
                 attack_team.push_back( attackers[attackers.size()-1 ] );
                 attackers.pop_back();
             }
-            std::cout << "DEBUG-- " << "Team attacking " << targets[i]->getName() << 
-                " is of size " << attack_team.size() << std::endl;
+            // std::cout << "DEBUG-- " << "Team attacking " << targets[i]->getName() << 
+            //     " is of size " << attack_team.size() << std::endl;
             
             // APPLY ATTACK
             apply_monster_attack( *targets[i], attack_team );
@@ -768,15 +812,25 @@ void GameMaster::monster_turn() {
     }
 
     // Wake wakeable OR make wakeable AND reset turn 
+    std::cout << std::endl;
+    std::cout << "Turn " << turn << " - ********* WAKE PHASE ********" << std::endl;
     // RESET TURN FOR NEXT ROUND
     for ( int i=0; i<monsters.size(); ++i ) {
 
         Actor * cursor = static_cast< Actor* >( &monsters[i] );
 
-        if ( cursor->canWake() )
-            cursor->wakeup();
-        else 
+        if ( cursor->canWake() ) {
+
+            if ( cursor->isStunned() ) {
+                std::cout << "EVENT- " << cursor->getName() << " recovers from stun." << std::endl;
+                cursor->wakeup();
+            }
+
+        } else {
+
             cursor->set_wakeable();
+
+        }
     
         cursor->reset_turn();
 
@@ -809,7 +863,7 @@ bool GameMaster::check_win_conditions() {
         if ( static_cast< Actor* >( &monsters[i] )->isAlive() )
             ++monsters_remaining;
     if ( monsters_remaining == 0 ) {
-        std::cout << "CREW WINS THE GAME" << std::endl;
+        std::cout << std::endl << "CREW WINS THE GAME" << std::endl;
         return true;
     }
 
@@ -817,7 +871,7 @@ bool GameMaster::check_win_conditions() {
         if ( static_cast< Actor* >( &crew[i] )->isAlive() )
             ++crew_remaining;
     if ( crew_remaining == 0 ) {
-        std::cout << "MONSTERS WINS THE GAME" << std::endl;
+        std::cout << std::endl << "MONSTERS WINS THE GAME" << std::endl;
         return true;
     }
     
@@ -827,9 +881,12 @@ bool GameMaster::check_win_conditions() {
 
 void GameMaster::apply_crew_attack( Actor& target, std::vector<Crew*>& attack_team ) {
 
-    std::cout << "--Resolving Attack--" << std::endl;
+    std::string prefix = "   ";
 
-    std::cout << "EVENT- Target is: " << target.getID() << " attack team is size: "
+    std::cout << std::endl;
+    std::cout << prefix << "Turn " << turn << " - ********* BATTLE ********" << std::endl;
+
+    std::cout << prefix << "Target is: " << target.getID() << " attack team is size: "
         << attack_team.size() << std::endl;  
 
     int hand_to_hand_strikes = 0;
@@ -839,16 +896,17 @@ void GameMaster::apply_crew_attack( Actor& target, std::vector<Crew*>& attack_te
     // MAKING ATTACK DECISIONS
     for (int i=0; i<attack_team.size(); ++i) {
 
-        std::cout << "EVENT- " << attack_team[i]->getName() << " ";
+        std::cout << prefix << "EVENT- " << attack_team[i]->getName() << " ";
 
         bool is_using_weapon = false;
         bool ranged_forced = (attack_team[i]->getLocation()->id != target.getLocation()->id);
-        std::cout << "DEBUG- attacker location id:" << attack_team[i]->getLocation()->id 
-                        << std::endl;        
-        std::cout << "DEBUG- target location id:" << target.getLocation()->id 
-                        << std::endl;
-        if ( ranged_forced )
-            std::cout << "DEBUG- ranged attack is forced." << std::endl;
+        // std::cout << "DEBUG- attacker location id:" << attack_team[i]->getLocation()->id 
+        //                 << std::endl;        
+        // std::cout << "DEBUG- target location id:" << target.getLocation()->id 
+        //                 << std::endl;
+        if ( ranged_forced ) {
+            // std::cout << "DEBUG- ranged attack is forced." << std::endl;
+        }
 
         if ( attack_team[i]->hasWeapon() ) {
 
@@ -898,21 +956,24 @@ void GameMaster::apply_crew_attack( Actor& target, std::vector<Crew*>& attack_te
         std::cout << std::endl;
 
         attack_team[i]->complete_turn();
-        std::cout  << "VERBOSE- " << attack_team[i]->getName() 
-                    << " is now unavailable until next turn" << std::endl; 
+        // std::cout  << "VERBOSE- " << attack_team[i]->getName() 
+        //             << " is now unavailable until next turn" << std::endl; 
 
     }
 
-    std::cout << "___CREW ATTACK EVENTS____________________________________" << std::endl;
     std::cout << "_________________________________________________________" << std::endl;
     
     // CALCULATING UNKNOWN EFFECTS
     if ( untested_weapon.size() > 0 ) {
 
         Effect * temp_effect = ActionGenerator::get_available_effect( effects );
-        untested_weapon[0]->assign_effect( *temp_effect );
-        std::cout << "EVENT- Weapon(" << untested_weapon[0]->getName() << ") is assigned the "
-                    << temp_effect->getName() << " effect." << std::endl;
+        // if ( temp_effect ) {
+            untested_weapon[0]->assign_effect( *temp_effect );
+            std::cout << prefix << "EVENT- Weapon(" << untested_weapon[0]->getName() << ") is assigned the "
+                        << temp_effect->getName() << " effect." << std::endl;
+        // } else { 
+        //     std::cout << "EVENT- Weapon(" << untested_weapon[0]->getName() << "- Error- No available effects" << std::endl;
+        // }
 
         for (int i=0; i<untested_weapon.size(); ++i) {
 
@@ -935,14 +996,14 @@ void GameMaster::apply_crew_attack( Actor& target, std::vector<Crew*>& attack_te
     hit( target, DIRECTED, damage );
 
     if ( damage.has_area_effect() && area_of_effect_actors.size() )
-        std::cout << "DEBUG- Area of effect damage is added." << std::endl;
+        // std::cout << "DEBUG- Area of effect damage is added." << std::endl;
 
     if ( damage.has_area_effect() )
         for ( auto it = area_of_effect_actors.begin(); it != area_of_effect_actors.end(); ++it ) 
             hit( **it, AREA_OF_EFFECT, damage );
 
     if ( damage.has_expanded_effect() && expansion_zone_entities.size() )
-        std::cout << "DEBUG- Expanded effect damage is added." << std::endl;
+        // std::cout << "DEBUG- Expanded effect damage is added." << std::endl;
 
     if ( damage.has_expanded_effect() )
         for ( auto it = expansion_zone_entities.begin(); it != expansion_zone_entities.end(); ++it ) 
@@ -951,20 +1012,31 @@ void GameMaster::apply_crew_attack( Actor& target, std::vector<Crew*>& attack_te
     // Remove Effect for Multi-Unknown condition
     if ( untested_weapon.size() > 1 ) {
         untested_weapon[0]->remove_effect();
-        std::cout << "EVENT- Weapon(" << untested_weapon[0] << ") effect "
-            << " was removed for multiple unknown effect case." 
-            << std::endl;
-    }
+        // std::cout << "EVENT- Weapon(" << untested_weapon[0] << ") effect "
+        //     << " was removed for multiple unknown effect case." 
+        //     << std::endl;
+    } else if ( untested_weapon.size() == 1 ) {
 
-    std::cout << "Complete Attack" << std::endl;
+        // Apply effect to other similar weapons.
+        std::cout << prefix << "EVENT- Assigning weapon effect(" << untested_weapon[0]->get_monster_effect()->getName() 
+                    << ") to all identical weapons in Weapon Manifest." << std::endl;
+        for ( int i=0; i<weapons.size(); ++i ) {
+            if ( weapons[i].getName() == untested_weapon[0]->getName() )
+                static_cast< Weapon* >( &weapons[i] )->assign_effect( *untested_weapon[0]->get_monster_effect() );
+        } 
+
+    }
 
 }
 
 void GameMaster::apply_monster_attack( Actor& target, std::vector<Monster*>& attack_team ) {
 
-    std::cout << "--Resolving Monster Attack--" << std::endl;
+    std::string prefix = "   ";
 
-    std::cout << "EVENT- Target is: " << target.getID() << " attack team is size: "
+    std::cout << std::endl;
+    std::cout << prefix << "Turn " << turn << " - ********* BATTLE ********" << std::endl;
+
+    std::cout << prefix << "Target is: " << target.getID() << " attack team is size: "
         << attack_team.size() << std::endl;  
 
     int hand_to_hand_strikes = 0;
@@ -976,12 +1048,11 @@ void GameMaster::apply_monster_attack( Actor& target, std::vector<Monster*>& att
         hand_to_hand_strikes += attack_team[i]->getStrength();
 
         attack_team[i]->complete_turn();
-        std::cout  << "VERBOSE- " << attack_team[i]->getName() 
-                    << " is now unavailable until next turn" << std::endl;
+        // std::cout  << "VERBOSE- " << attack_team[i]->getName() 
+        //             << " is now unavailable until next turn" << std::endl;
 
     }
 
-    std::cout << "___MONSTER ATTACK EVENTS_________________________________" << std::endl;
     std::cout << "_________________________________________________________" << std::endl;
 
     Location * attack_location = target.getLocation();
@@ -1008,16 +1079,16 @@ void GameMaster::apply_monster_attack( Actor& target, std::vector<Monster*>& att
 
         if ( target_crew->isRobot() && effect ) {
        
-            std::cout << "STATE- Monster(" << affected_monster->getName() << ", " << affected_monster->getID() 
+            std::cout << prefix << "EVENT- Monster(" << affected_monster->getName() << ", " << affected_monster->getID() 
                                 << ") eats the Robot." << std::endl;
 
-            std::cout << "VERBOSE- Effect(" << effect->getName() << ")" << std::endl;
+            // std::cout << "VERBOSE- Effect(" << effect->getName() << ")" << std::endl;
 
             if ( effect->is_kill_type() ) {
 
                 if ( roll_result <= affected_monster->getConstitution() ) {
                     affected_monster->kill();
-                    std::cout << "STATE- Monster(" << affected_monster->getName() << ", " << affected_monster->getID() 
+                    std::cout << prefix << "EVENT- Monster(" << affected_monster->getName() << ", " << affected_monster->getID() 
                                 << ") has been killed." << std::endl;
                 }
 
@@ -1025,7 +1096,7 @@ void GameMaster::apply_monster_attack( Actor& target, std::vector<Monster*>& att
 
                 if ( roll_result <= affected_monster->getConstitution() ) {
                     affected_monster->stun();
-                    std::cout << "STATE- Monster(" << affected_monster->getName() << ", " << affected_monster->getID() 
+                    std::cout << prefix << "EVENT- Monster(" << affected_monster->getName() << ", " << affected_monster->getID() 
                                 << ") has been stunned." << std::endl;
                 }
         
@@ -1045,7 +1116,7 @@ void GameMaster::apply_monster_attack( Actor& target, std::vector<Monster*>& att
         
         } else { 
             
-            std::cout << "STATE- Monster(" << affected_monster->getName() << ", " << affected_monster->getID() 
+            std::cout << prefix << "EVENT- Monster(" << affected_monster->getName() << ", " << affected_monster->getID() 
                                 << ") eats the crewman and grows." << std::endl;
             grow_monster( *affected_monster );
 
@@ -1053,13 +1124,13 @@ void GameMaster::apply_monster_attack( Actor& target, std::vector<Monster*>& att
 
     }
 
-    std::cout << "Complete Attack" << std::endl;
-
 }
 
 // Function that deals with applying the damage to Entities using the DamageProfile
 // provided in the arguments.
 Entity * GameMaster::hit( Entity& e, DAMAGE_TYPE type, DamageProfile& p ) {
+
+    std::string prefix = "   ";
 
     int kill = 0;
     int stun = 0;
@@ -1104,7 +1175,7 @@ Entity * GameMaster::hit( Entity& e, DAMAGE_TYPE type, DamageProfile& p ) {
         if ( grow ) {
 
             grow_monster( *target );
-            std::cout << "STATE- Monster(" << target->getName() << ", " << target->getID() 
+            std::cout << prefix << "EVENT- Monster(" << target->getName() << ", " << target->getID() 
                         << ") has grown." << std::endl;
 
         }
@@ -1112,7 +1183,7 @@ Entity * GameMaster::hit( Entity& e, DAMAGE_TYPE type, DamageProfile& p ) {
         if ( shrink ) {
 
             shrink_monster( *target );
-            std::cout << "STATE- Monster(" << target->getName() << ", " << target->getID() 
+            std::cout << prefix << "EVENT- Monster(" << target->getName() << ", " << target->getID() 
                         << ") has shrunk." << std::endl;
 
         }
@@ -1120,28 +1191,28 @@ Entity * GameMaster::hit( Entity& e, DAMAGE_TYPE type, DamageProfile& p ) {
         if ( target_constitution <= kill ) {
 
             target->kill();
-            std::cout << "STATE- Monster(" << target->getName() << ", " << target->getID() 
+            std::cout << prefix << "EVENT- Monster(" << target->getName() << ", " << target->getID() 
                         << ") has been killed." << std::endl;
 
         // FRAGMENT
         } else if ( fragment ) {
 
             new_fragments = fragment_monster( *target );
-            std::cout << "STATE- Monster(" << target->getName() << ", " << target->getID() 
+            std::cout << prefix << "EVENT- Monster(" << target->getName() << ", " << target->getID() 
                         << ") has blown up." << std::endl;
 
         // STUN
         } else if ( target_constitution <= stun ) {
             
             target->stun();
-            std::cout << "STATE- Monster(" << target->getName() << ", " << target->getID() 
+            std::cout << prefix << "EVENT- Monster(" << target->getName() << ", " << target->getID() 
                         << ") has been stunned." << std::endl;
             for ( int f=0; f<new_fragments.size(); ++f )
                 new_fragments[f]->stun();
 
         } else {
 
-            std::cout << "STATE- Monster(" << target->getName() << ", " << target->getID() 
+            std::cout << prefix << "EVENT- Monster(" << target->getName() << ", " << target->getID() 
                         << ") survived attack unscathed." << std::endl;
 
         }
@@ -1171,19 +1242,19 @@ Entity * GameMaster::hit( Entity& e, DAMAGE_TYPE type, DamageProfile& p ) {
 
             target->drop();
             target->kill();
-            std::cout << "STATE- Crew(" << target->getName() << ", " << target->getID() 
+            std::cout << prefix << "EVENT- Crew(" << target->getName() << ", " << target->getID() 
                         << ") has been killed." << std::endl;
 
         // STUN
         } else if ( target_constitution <= stun ) {
             
             target->stun();            
-            std::cout << "STATE- Crew(" << target->getName() << ", " << target->getID() 
+            std::cout << prefix << "EVENT- Crew(" << target->getName() << ", " << target->getID() 
                         << ") has been stunned." << std::endl;
 
         } else {
 
-            std::cout << "STATE- Crew(" << target->getName() << ", " << target->getID() 
+            std::cout << prefix << "EVENT- Crew(" << target->getName() << ", " << target->getID() 
                         << ") survived attack unscathed." << std::endl;
 
         }
@@ -1219,8 +1290,8 @@ bool GameMaster::monster_limit_reached( std::string stage ) {
 
     }
 
-    std::cout << "DEBUG- for " << stage << " stage, count: " << count << " max: " << max_count
-                << std::endl;
+    // std::cout << "DEBUG- for " << stage << " stage, count: " << count << " max: " << max_count
+    //             << std::endl;
 
     return count >= max_count;
 
@@ -1270,26 +1341,26 @@ bool GameMaster::monster_can_shrink( Monster& monster ) {
 // Remove the prevention checks for this function because they are redundant
 void GameMaster::grow_monster( Monster& monster ) {
 
-    std::cout << "VERBOSE- Attempting to grow Monster(" << monster.getID() << ")"
-                    << std::endl;
+    // std::cout << "VERBOSE- Attempting to grow Monster(" << monster.getID() << ")"
+    //                 << std::endl;
 
     bool can_grow = monster_can_grow( monster );
 
     if ( !can_grow ) {
-        std::cout << "VERBOSE- Monster limit reached. Monster(" << monster.getID() << ")"
-                    << " cannot grow" << std::endl;
+        // std::cout << "VERBOSE- Monster limit reached. Monster(" << monster.getID() << ")"
+        //             << " cannot grow" << std::endl;
         return;
     }
 
     if ( monster.getStage() == "ADULT" ) {
 
-        std::cout << "VERBOSE- Adult Monster attemping to lay an EGG " << std::endl;
+        // std::cout << "VERBOSE- Adult Monster attemping to lay an EGG " << std::endl;
         
         Entity * created_egg = new Monster( "EGG" );      
         created_egg->enter( *monster.getLocation() );
         monsters.add( *created_egg );
 
-        std::cout << "VERBOSE- Monster layed an egg" << std::endl;
+        std::cout << "EVENT- Monster layed an egg" << std::endl;
         
 
     } else {
@@ -1302,16 +1373,16 @@ void GameMaster::grow_monster( Monster& monster ) {
 
 void GameMaster::grow_monsters( ) {
 
-    std::cout << "VERBOSE- Generate growth options" << std::endl;
+    // std::cout << "VERBOSE- Generate growth options" << std::endl;
     std::vector< std::string > options = ActionGenerator::get_growth_options( monsters );
-    std::cout << "VERBOSE- Found " << options.size() << " options" << std::endl;
+    // std::cout << "VERBOSE- Found " << options.size() << " options" << std::endl;
 
     for ( int i=0; i<options.size(); ++i ) {
 
-        std::cout << "VERBOSE- Checking if " << options[i] << " can grow" << std::endl;
+        // std::cout << "VERBOSE- Checking if " << options[i] << " can grow" << std::endl;
         if ( monster_can_grow( options[i] ) ) {
         
-            std::cout << "VERBOSE- Growing " << options[i] << " is allowed" << std::endl;
+            // std::cout << "VERBOSE- Growing " << options[i] << " is allowed" << std::endl;
             std::vector< Monster* > growth_targets; 
             growth_targets = ActionGenerator::get_monsters_of_stage( options[i], monsters );
             for ( int j=0; j<growth_targets.size(); ++j ) {
@@ -1324,29 +1395,32 @@ void GameMaster::grow_monsters( ) {
 
         } else {
 
-            std::cout << "VERBOSE- " << options[i] << " is maxed. Trying another option" 
-                        << std::endl;
+            // std::cout << "VERBOSE- " << options[i] << " is maxed. Trying another option" 
+            //             << std::endl;
 
         }
 
     }
 
-    std::cout << "VERBOSE- No growing could be performed" << std::endl;
+    // std::cout << "VERBOSE- No growing could be performed" << std::endl;
 
 }
 
 
 void GameMaster::shrink_monster( Monster& monster ) {
 
-    std::cout << "VERBOSE- Attempting to shrink Monster(" << monster.getID() << ")"
-                    << std::endl;
+    // std::cout << "VERBOSE- Attempting to shrink Monster(" << monster.getID() << ")"
+    //                 << std::endl;
 
     bool can_shrink = monster_can_shrink( monster );
 
     if ( !can_shrink ) {
-        std::cout << "VERBOSE- Monster limit reached. Monster(" << monster.getID() << ")"
-                    << " cannot shrink" << std::endl;
+
+        monster.kill();
+        // std::cout << "VERBOSE- Monster limit reached. Monster(" << monster.getID() << ")"
+        //             << " cannot shrink so it was killed" << std::endl;
         return;
+
     }
 
     monster.shrink();
@@ -1358,8 +1432,8 @@ std::vector< Monster* > GameMaster::fragment_monster( Monster& monster ) {
     int number_of_pieces = roll_dice(1);
     std::vector< Monster* > output;
 
-    std::cout << "VERBOSE- Attempting to fragment Monster(" << monster.getID() << ")"
-                    << " into " << number_of_pieces << " pieces." << std::endl;
+    // std::cout << "VERBOSE- Attempting to fragment Monster(" << monster.getID() << ")"
+    //                 << " into " << number_of_pieces << " pieces." << std::endl;
             
     std::cout << "EVENT- Monster(" << monster.getName() << ", " << monster.getID() << ") is blown apart ";
     
@@ -1379,6 +1453,45 @@ std::vector< Monster* > GameMaster::fragment_monster( Monster& monster ) {
     monster.kill();
 
     return output;
+
+}
+
+void GameMaster::bring_out_your_dead( Manifest& m ) {
+
+    for ( int i=0; i<m.size(); ++i ) {
+
+        Actor * a = static_cast< Actor* >( &m[i] );
+        if ( !a->isAlive() ) {
+            
+
+        }
+
+
+    }
+
+}
+
+std::string GameMaster::summarize_game() {
+
+    std::stringstream ss;
+
+    ss << "Game ran for ";
+    if ( turn >= max_turns ) 
+            ss << "max turn count of " << turn-1;
+    else
+        ss << turn;
+
+    ss << " Turns." << std::endl;
+
+    std::vector< Crew* > crew_left = ActionGenerator::shuffled_crew_list( crew );
+    ss << "Crew faced " << ( crew.size() - crew_left.size() ) << " casualties." << std::endl;
+
+    //Count Dead Monsters
+    std::vector< Monster* > monsters_left = ActionGenerator::shuffled_monster_list( monsters );
+    //Count Dead Crew
+    ss << "Monsters faced " << ( monsters.size() - monsters_left.size() ) << " casualties." << std::endl;
+
+    return ss.str();
 
 }
 

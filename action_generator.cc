@@ -175,7 +175,7 @@ std::vector< Crew* > ActionGenerator::get_armed_crew_except_self( Crew * c,
     std::vector< Entity* > temp = get_entities( CREW, l, m );
     std::vector< Crew* > output;
 
-    std::cout << "DEBUG--AG-- Num crew entities in location: " << temp.size() << std::endl;
+    // std::cout << "DEBUG--AG-- Num crew entities in location: " << temp.size() << std::endl;
 
     for ( int i=0; i<temp.size(); ++i )
         if ( c->getID() != temp[i]->getID() ) 
@@ -360,8 +360,8 @@ std::vector< Crew* >
     for ( int i=0; i<active.size(); ++i ) {
 
         if ( !active[i]->canAttack() ) { 
-            std::cout << "VERBOSE- crew[" << active[i]->getName() << "] cannot attack."
-                        << std::endl;
+            // std::cout << "VERBOSE- crew[" << active[i]->getName() << "] cannot attack."
+            //             << std::endl;
             continue;
         }
 
@@ -369,36 +369,36 @@ std::vector< Crew* >
 
         if ( crew_map_idx == l.map_idx ) {
             output.push_back( active[i] );
-            std::cout << "VERBOSE- crew[" << active[i]->getName() << "] is located in same place as target."
-                        << std::endl;
+            // std::cout << "VERBOSE- crew[" << active[i]->getName() << "] is located in same place as target."
+            //             << std::endl;
             continue;
         } else {
-            std::cout << "VERBOSE- crew[" << active[i]->getName() << "] is not in the same place as target."
-                        << std::endl;
+            // std::cout << "VERBOSE- crew[" << active[i]->getName() << "] is not in the same place as target."
+            //             << std::endl;
         }
         if ( active[i]->hasWeapon() && active[i]->getWeapon()->isRanged() ) {
-            std::cout << "VERBOSE- crew[" << active[i]->getName() << "] has a ranged weapon.";
+            // std::cout << "VERBOSE- crew[" << active[i]->getName() << "] has a ranged weapon.";
                         
             bool had_sightline_debug_flag = false;
 
-            std::cout << "    Sightlines: ";
-            for ( auto ids: l.room_sightlines )
-                std::cout << ids << ' ';
-            std::cout << " : CrewMapIDX: " << crew_map_idx << std::endl;
+            // std::cout << "    Sightlines: ";
+            // for ( auto ids: l.room_sightlines )
+            //     std::cout << ids << ' ';
+            // std::cout << " : CrewMapIDX: " << crew_map_idx << std::endl;
 
             for ( int j=0; j<l.room_sightlines.size(); ++j ) {
 
                 if ( crew_map_idx == l.room_sightlines[j] ) {
                     output.push_back( active[i] );
-                    std::cout << " And has line of sight to target." << std::endl;
+                    // std::cout << " And has line of sight to target." << std::endl;
                     had_sightline_debug_flag = true;
                     break;
                 }
 
             }
 
-            if ( had_sightline_debug_flag == false )
-                std::cout << " But no line of sight." << std::endl;
+            // if ( had_sightline_debug_flag == false )
+            //     std::cout << " But no line of sight." << std::endl;
 
         }
 
@@ -420,8 +420,8 @@ std::vector< Monster* >
         if ( active[i]->canAttack() && active[i]->getLocation()->id == l.id ) 
             output.push_back( active[i] );
 
-    std::cout << "DEBUG-- " << output.size() << " monsters can attack location " << 
-        l.getName() << std::endl;
+    // std::cout << "DEBUG-- " << output.size() << " monsters can attack location " << 
+    //     l.getName() << std::endl;
 
     return output;
 
@@ -449,7 +449,7 @@ Effect * ActionGenerator::get_available_effect( std::vector< Effect* >& m ) {
         if ( m[i]->is_available() )
             return m[i];
 
-    return m[0];
+    return nullptr;
 
 }
 

@@ -16,6 +16,8 @@ public:
 
     int size();
     void add( Entity& );
+
+    void remove( int );
     
     Entity& getEntity( int );
     Entity& operator[]( int );

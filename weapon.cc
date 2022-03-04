@@ -26,41 +26,41 @@ void Weapon::set_ranged() {
 
 void Weapon::set_deployable() { 
 
-    std::cout << "DEBUG - " << deployable << std::endl;
+    // std::cout << "DEBUG - " << deployable << std::endl;
     deployable = true; 
-    std::cout << "DEBUG - set_deployable: " << deployable << std::endl;
+    // std::cout << "DEBUG - set_deployable: " << deployable << std::endl;
 
 }
 
 void Weapon::set_area_of_effect() { 
 
-    std::cout << "DEBUG - is area effect weapon: " << has_area_of_effect << std::endl;
+    // std::cout << "DEBUG - is area effect weapon: " << has_area_of_effect << std::endl;
     has_area_of_effect = true; 
-    std::cout << "DEBUG - set_area_of_effect: " << has_area_of_effect << std::endl;
+    // std::cout << "DEBUG - set_area_of_effect: " << has_area_of_effect << std::endl;
 
 }
 
 void Weapon::set_expanding() { 
 
-    std::cout << "DEBUG - has expansion properties:" << expands << std::endl;
+    // std::cout << "DEBUG - has expansion properties:" << expands << std::endl;
     expands = true; 
-    std::cout << "DEBUG - set_expanding: " << expands << std::endl;
+    // std::cout << "DEBUG - set_expanding: " << expands << std::endl;
 
 }
 
 void Weapon::set_single_use() { 
 
-    std::cout << "DEBUG - has single-use properties:" << expands << std::endl;
+    // std::cout << "DEBUG - has single-use properties:" << expands << std::endl;
     single_use = true; 
-    std::cout << "DEBUG - set_single_use: " << expands << std::endl;
+    // std::cout << "DEBUG - set_single_use: " << expands << std::endl;
 
 }
 
 void Weapon::set_respawning() { 
 
-    std::cout << "DEBUG - has respawns:" << respawning << std::endl;
+    // std::cout << "DEBUG - has respawns:" << respawning << std::endl;
     respawning = true; 
-    std::cout << "DEBUG - set_respawning: " << respawning << std::endl;
+    // std::cout << "DEBUG - set_respawning: " << respawning << std::endl;
 
 }
 
@@ -73,9 +73,9 @@ void Weapon::set_respawn_location( Location& l ) {
 
 void Weapon::repawn() {
 
-    std::cout << "STATE- Weapon(" << getName() << ", " << getID() << " respawned at ";
+    // std::cout << "STATE- Weapon(" << getName() << ", " << getID() << " respawned at ";
     enter( *respawn_location );
-    std::cout << location->getName() << std::endl;
+    // std::cout << location->getName() << std::endl;
 
 }
 
@@ -88,7 +88,7 @@ void Weapon::grab() {
 
 void Weapon::drop( Location& l ) {
 
-    std::cout << l.getName();
+    // std::cout << l.getName();
     enter( l );
     held = false;
 
@@ -105,7 +105,7 @@ void Weapon::deploy( Location& l ) {
 void Weapon::set_regular_effect( Effect& e ) {
 
     if ( regular_effect ) {
-        std::cout << "ERROR: Weapon already has assignment" << std::endl; 
+        // std::cout << "ERROR: Weapon already has assignment" << std::endl; 
         return;
     }
     regular_effect = &e;
@@ -115,7 +115,7 @@ void Weapon::set_regular_effect( Effect& e ) {
 void Weapon::assign_effect( Effect& e ) {
     
     if ( monster_effect ) {
-        std::cout << "ERROR: Weapon already has assignment" << std::endl; 
+        // std::cout << "ERROR: Weapon already has assignment" << std::endl; 
         return;
     }
     monster_effect = &e;
@@ -155,13 +155,3 @@ bool Weapon::hasAreaEffect() {  return has_area_of_effect;  }
 
 bool Weapon::hasExpandingEffect() {  return expands;  }
 
-
-// void Weapon::pickup( Actor& a ) {
-//     onGround = false;
-//     location = &a.getLocation();
-//     wielder = &a;
-// }
-
-// void Weapon::discoverEffect( WeaponEffect& e ) {
-//     effect = &e;
-// }

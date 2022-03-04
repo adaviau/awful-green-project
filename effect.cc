@@ -7,10 +7,16 @@ Effect::Effect() : id( ++UNIQUE_IDENTIFIER ), available( true ) { }
 
 Effect::Effect( EFFECT_TYPE t ) : Effect() {
 
+    set_type( t );
+
+}
+
+void Effect::set_type( EFFECT_TYPE t ) {
+
     type = t;
     name = std::to_string( id ) + " - " + init();
 
-    std::cout << "DEBUG- Constructor(Effect) - Name:" << name << std::endl; 
+    // std::cout << "DEBUG- Constructor(Effect) - Name:" << name << std::endl; 
 
 }
 

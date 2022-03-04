@@ -19,7 +19,7 @@ void Actor::setStats( int m, int c, int s ) {
     movement = m;
     strength = s;
     constitution = c;
-    std::cout << "Stats (m,s,c) : " << movement << "," << strength << "," << constitution << "\n";
+    // std::cout << "Stats (m,s,c) : " << movement << "," << strength << "," << constitution << "\n";
 }
 
 int Actor::getMovement() { return movement; }

@@ -2,6 +2,7 @@
 #define GAME_MASTER_H
 
 #include <iostream>
+#include <sstream>
 
 #include "map.h"
 #include "location.h"
@@ -66,6 +67,9 @@ private:
     void apply_crew_attack( Actor&, std::vector< Crew* >& );    
     void apply_monster_attack( Actor&, std::vector< Monster* >& );
     int resolve_damage( Effect& );
+
+    void bring_out_your_dead( Manifest& );
+    std::string summarize_game();
 
 public:
     GameMaster();

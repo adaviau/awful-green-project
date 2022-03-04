@@ -13,6 +13,13 @@ void Manifest::add( Entity& e ) {
     
 }
 
+void Manifest::remove( int i ) {
+    
+    // output[i] = output[ output.size()-1 ];
+    // output.pop_back();
+    
+}
+
 Entity& Manifest::getEntity( int idx ) { return *entities[idx]; } 
 
 Entity& Manifest::operator[]( int index ) {

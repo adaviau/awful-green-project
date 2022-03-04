@@ -41,6 +41,7 @@ public:
 
     void set_available();
     void set_unavailable();
+    void set_type( EFFECT_TYPE );
 
     EFFECT_TYPE get_effect();
     int get_dice_count();
