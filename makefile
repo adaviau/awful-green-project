@@ -13,6 +13,7 @@ link: compile
 		action_generator.o \
 		attack_plan.o \
 		game_master.o \
+		file_loader.o \
 		initializer.o \
 		main.o 
 
@@ -26,6 +27,7 @@ compile:
 		action_generator.cc \
 		attack_plan.cc \
 		game_master.cc \
+		file_loader.cc \
 		initializer.cc \
 		main.cc
 

@@ -15,6 +15,7 @@
 #include "damage_profile.h"
 
 #include "initializer.h"
+#include "file_loader.h"
 #include "action_generator.h"
 
 class GameMaster {

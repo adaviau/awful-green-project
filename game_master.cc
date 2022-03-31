@@ -471,7 +471,6 @@ void GameMaster::run() {
     bool winner = false;
 
     crew_discovers_monsters();
-    crew_turn();
 
     while ( ++turn <= max_turns ) {
 
@@ -747,7 +746,7 @@ void GameMaster::monster_turn() {
             std::uniform_int_distribution<int> range( 0, move_to.size()-1 );
             (*it)->enter( *move_to[ range( mt_rand ) ] );
 
-            std::cout << (*it)->getName() << "(" << (*it)->getID() << ")";
+            std::cout << "EVENT- " << (*it)->getName() << "(" << (*it)->getID() << ")";
             std::cout << " moved to " << (*it)->getLocation()->getName() << std::endl;
 
         }
@@ -841,6 +840,8 @@ void GameMaster::monster_turn() {
 void GameMaster::crew_discovers_monsters() {
 
     std::cout << "Turn " << turn << " - Awful Green Things Discovered" << std::endl;
+
+    crew_turn();
     // Move (1 or 2 crew up to allowed movement to discover monsters)
     // Attack (Hand to Hand only)
 
@@ -1382,7 +1383,7 @@ void GameMaster::grow_monsters( ) {
         // std::cout << "VERBOSE- Checking if " << options[i] << " can grow" << std::endl;
         if ( monster_can_grow( options[i] ) ) {
         
-            // std::cout << "VERBOSE- Growing " << options[i] << " is allowed" << std::endl;
+            std::cout << "EVENT- Growing " << options[i] << " selected." << std::endl;
             std::vector< Monster* > growth_targets; 
             growth_targets = ActionGenerator::get_monsters_of_stage( options[i], monsters );
             for ( int j=0; j<growth_targets.size(); ++j ) {
@@ -1402,7 +1403,7 @@ void GameMaster::grow_monsters( ) {
 
     }
 
-    // std::cout << "VERBOSE- No growing could be performed" << std::endl;
+    std::cout << "EVENT- No growth performed." << std::endl;
 
 }
 

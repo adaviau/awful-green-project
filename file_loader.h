@@ -3,7 +3,7 @@
 
 #include <string>
 #include <vector>
-#include <game_master.h>
+#include <iostream>
 
 #include <fstream>
 
@@ -15,9 +15,17 @@ private:
     std::ifstream file;
     std::string word;
 
+    std::string parse_lines( std::string );
+
 public:
 
+    FileLoader();
+    FileLoader( std::string );
+
     bool open_file( std::string );
+    bool open_file();
+
+    bool close_file();
 
 
 
