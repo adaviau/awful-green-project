@@ -37,6 +37,7 @@ namespace ActionGenerator {
 
     // std::vector< Weapon* > get_grabbable_weapons( Crew&, Location&, Map& );
     std::vector< Weapon* > get_weapons( Location&, Map& );
+    std::vector< Weapon* > get_viable_weapons( Location&, Map& );
 
     // HELPERS
     std::vector< Entity* > get_entities( ENTITY_TYPE, Location&, Map& );

@@ -155,3 +155,17 @@ bool Weapon::hasAreaEffect() {  return has_area_of_effect;  }
 
 bool Weapon::hasExpandingEffect() {  return expands;  }
 
+bool Weapon::has_viable_effect() {  
+    
+    if ( monster_effect ) {
+        if ( monster_effect->is_kill_type() )
+            return true;
+        else if ( monster_effect->is_shrink_type() )
+            return true;
+        else if ( monster_effect->is_stun_type() )
+            return true;
+    }
+    return false;
+    
+}
+

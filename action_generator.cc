@@ -298,6 +298,36 @@ std::vector< Weapon* > ActionGenerator::get_weapons( Location& l, Map& m ) {
     return output;
 
 }
+// Get Viable Weapons at a location
+std::vector< Weapon* > ActionGenerator::get_viable_weapons( Location& l, Map& m ) {
+
+    std::vector< Entity* > temp = get_entities( WEAPON, l, m );
+    std::vector< Weapon* > output;
+
+    for ( int i=0; i<temp.size(); ++i ) {
+        if ( static_cast< Weapon* >( temp[i] )->isTested() ) {
+            if ( static_cast< Weapon* >( temp[i] )->has_viable_effect() ) {
+                output.push_back( static_cast< Weapon* >( temp[i] ) );
+                // std::cout << "DEBUG-- " << "Weapon(" << static_cast< Weapon* >( temp[i] )->getName()
+                //     << " is viable with effect of " << static_cast< Weapon* >( temp[i] )->get_monster_effect()->getName()
+                //     << std::endl;
+            } else {
+                // std::cout << "DEBUG-- " << "Weapon(" << static_cast< Weapon* >( temp[i] )->getName()
+                //     << " is NOT VIABLE with effect of " << static_cast< Weapon* >( temp[i] )->get_monster_effect()->getName()
+                //     << std::endl;
+            }
+        } else {
+            output.push_back( static_cast< Weapon* >( temp[i] ) );
+            // std::cout << "DEBUG-- " << "Weapon(" << static_cast< Weapon* >( temp[i] )->getName()
+            //     << " is untested. "
+            //     << std::endl;
+        }
+
+    }
+
+    return output;
+
+}
 
 /* RANDOM ORDERINGS FUNCTIONS
  * 

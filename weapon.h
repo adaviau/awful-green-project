@@ -52,6 +52,7 @@ public:
     bool isRespawning();
     bool hasAreaEffect();
     bool hasExpandingEffect();
+    bool has_viable_effect();
 
     bool isTested( );
     void assign_effect( Effect& );

@@ -11,6 +11,10 @@ GameMaster::GameMaster( int turn_option ) : turn( 0 ), max_turns( turn_option ) 
     max_baby_monsters = 18;
     max_adult_monsters = 18;
 
+    drop_negative_effect_weapons = false;
+    monsters_multiply_first = false;
+    monsters_grow_most_numerous = false;
+
     // max_fragment_monsters = 8;
     // max_egg_monsters = 10;
     // max_baby_monsters = 8;
@@ -511,6 +515,14 @@ void GameMaster::crew_turn() {
     // crew.debug();
 
     // Grab Weapons
+    
+    // Drop Bad Weapons
+    if ( drop_negative_effect_weapons ) 
+        for (auto it = list.begin(); it != list.end(); ++it) 
+            if ( (*it)->hasWeapon() ) 
+                if ( !(*it)->getWeapon()->has_viable_effect() ) 
+                    (*it)->drop();
+
     for (auto it = list.begin(); it != list.end(); ++it) {
 
         if ( (*it)->canGrabWeapon() ) {
@@ -533,7 +545,15 @@ void GameMaster::crew_turn() {
 
         // NEED TO BUILD PICKUP OF DEPLOYED WEAPONS
 
-        std::vector< Weapon* > ground_weapons = ActionGenerator::get_weapons( *crew_location, map );
+        std::vector< Weapon* > ground_weapons;
+
+        if ( drop_negative_effect_weapons ) 
+            ground_weapons = ActionGenerator::get_viable_weapons( *crew_location, map );
+        else
+            ground_weapons = ActionGenerator::get_weapons( *crew_location, map );
+        
+
+
         std::vector< Crew* > trade_options = 
             ActionGenerator::get_armed_crew_except_self( *it, *crew_location, map );
 
@@ -544,10 +564,10 @@ void GameMaster::crew_turn() {
         option_count += trade_options.size();
 
 
-        // std::cout << "There are " << option_count << " weapon action(s) to choose.";
+        std::cout << "There are " << option_count << " weapon action(s) to choose.";
         std::uniform_int_distribution<int> range( 0, option_count-1 );
         int action_choice = range( mt_rand );
-        // std::cout << " Selecting weapon option: " << action_choice << std::endl;
+        std::cout << " Selecting weapon option: " << action_choice << std::endl;
 
         if ( action_choice == 0 ) {
             // Do Nothing
@@ -732,7 +752,12 @@ void GameMaster::monster_turn() {
     std::vector< Monster* > list = ActionGenerator::shuffled_monster_list( monsters );
 
     // Grow
-    grow_monsters();
+    if ( monsters_grow_most_numerous )
+        grow_most_numerous_monsters();
+    else if ( monsters_multiply_first )
+        multiply_before_grow_monsters();
+    else
+        grow_monsters();
 
     std::cout << std::endl;
     std::cout << "Turn " << turn << " - ******* MOVEMENT PHASE ******" << std::endl;
@@ -1368,6 +1393,36 @@ void GameMaster::grow_monster( Monster& monster ) {
 
         monster.grow();
 
+    }
+
+}
+
+void GameMaster::grow_most_numerous_monsters() {
+
+    std::vector< std::string > options = ActionGenerator::get_growth_options( monsters );
+    int target_index = -1;
+    std::vector< Monster* > growth_targets;
+    
+    for ( int i=0; i<options.size(); ++i ) {
+        std::vector< Monster* > temp_targets = ActionGenerator::get_monsters_of_stage( options[i], monsters );
+        if ( growth_targets.size() < temp_targets.size() )
+            growth_targets = temp_targets;
+    }
+    for ( int i=0; i<growth_targets.size(); ++i ) {
+        grow_monster( *growth_targets[i] );
+    }
+
+}
+
+void GameMaster::multiply_before_grow_monsters() {
+
+    if ( monster_can_grow( "ADULT" ) ) {
+        std::vector< Monster* > growth_targets = ActionGenerator::get_monsters_of_stage( "ADULT", monsters );
+            for ( int j=0; j<growth_targets.size(); ++j ) {
+                grow_monster( *growth_targets[j] );
+            }
+    } else {
+        grow_monsters();
     }
 
 }

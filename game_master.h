@@ -38,6 +38,10 @@ private:
     int max_adult_monsters;
 
     bool friendly_fire;
+    bool drop_negative_effect_weapons;
+
+    bool monsters_multiply_first;
+    bool monsters_grow_most_numerous;
 
     std::mt19937 mt_rand;
 
@@ -56,6 +60,9 @@ private:
     bool monster_can_grow( Monster& );
     void grow_monster( Monster& );
     void grow_monsters( );
+
+    void grow_most_numerous_monsters();
+    void multiply_before_grow_monsters();
 
     bool monster_can_shrink( std::string );
     bool monster_can_shrink( Monster& );
